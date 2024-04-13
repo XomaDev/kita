@@ -1,0 +1,8 @@
+Int IntClass
+disp display
+~ Kita
+: Colon
++ Add
+- Negate
+/ Slash
+* Asterisk
