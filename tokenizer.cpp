@@ -29,13 +29,14 @@ void tokenizer::load_names() {
     file.close();
 }
 
-void tokenizer::tokenize() {
+vector<unique_ptr<token>> tokenizer::tokenize() {
     while (!isEOF()) {
         scan_tokens();
     }
-    for (auto token : tokens) {
+    for (const auto &token : tokens) {
         cout << token->str_repr() << endl;
     }
+    return std::move(tokens);
 }
 
 void tokenizer::scan_tokens() {

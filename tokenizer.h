@@ -5,6 +5,7 @@
 #ifndef KITA_TOKENIZER_H
 #define KITA_TOKENIZER_H
 
+#include <memory>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -36,18 +37,13 @@ class tokenizer {
     bool isEOF() const;
 
 public:
-    vector<token *> tokens;
+    vector<unique_ptr<token>> tokens;
     tokenizer(const string &static_names, const string &source)
                     : static_names(static_names), source(source), source_length(source.length()) {
         // constructor initialized
     }
-    ~tokenizer() {
-        for (auto token: tokens) {
-            delete token;
-        }
-    }
     void load_names();
-    void tokenize();
+    vector<unique_ptr<token>> tokenize();
 };
 
 

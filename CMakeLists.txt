@@ -9,4 +9,6 @@ add_executable(kita main.cpp
         token.cpp
         token.h
         kita_type.h
+        parser.cpp
+        parser.h
 )

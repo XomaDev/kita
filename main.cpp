@@ -2,6 +2,7 @@
 #include <sstream>
 #include <fstream>
 #include "tokenizer.h"
+#include "parser.h"
 
 using namespace std;
 
@@ -20,9 +21,19 @@ int main() {
     string static_names = "/home/kumaraswamy/Documents/kita/static_names.txt";
     string source_file = "/home/kumaraswamy/Documents/kita/playground/hi.kita";
 
-    auto tokenizer = new class tokenizer(static_names, read_string(source_file));
+    string source = read_string(source_file);
+    cout << source << endl << endl;
+    auto tokenizer = new class tokenizer(static_names, source);
     tokenizer->load_names();
-    tokenizer->tokenize();
 
+    auto tokens = tokenizer->tokenize();
+    delete tokenizer;
+
+    cout << endl << endl;
+
+    auto parser = new class parser(std::move(tokens));
+    parser->parse();
+
+    delete parser;
     return 0;
 }
