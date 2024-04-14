@@ -1,0 +1,36 @@
+//
+// Created by kumaraswamy on 4/14/24.
+//
+
+#ifndef KITA_EXPR_BASE_H
+#define KITA_EXPR_BASE_H
+
+#include <string>
+#include <utility>
+
+using namespace std;
+
+class expr_base {
+    string display;
+public:
+    expr_base() = default;
+    explicit expr_base(string display) : display(std::move(display)) {
+        // constructor initialized
+    }
+
+    void set_display(string new_display) {
+        this->display = std::move(new_display);
+    }
+
+    virtual void write() {
+        throw std::runtime_error("write() method is not implemented.");
+    }
+    virtual ~expr_base() = default;
+
+    string to_string() {
+        return display;
+    }
+};
+
+
+#endif //KITA_EXPR_BASE_H
