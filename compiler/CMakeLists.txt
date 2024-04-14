@@ -16,4 +16,5 @@ add_executable(kita main.cpp
         expr/expr_binary.h
         expr/expr_type.h
         expr/expr_invoke.h
+        expr/expr_func.h
 )

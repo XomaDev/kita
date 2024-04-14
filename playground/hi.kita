@@ -1,2 +1,4 @@
-Int~a: 8 + 2
-disp a _ b
+fn hewwo {
+    Int~a: 8 + 2
+    disp a _ 0
+}

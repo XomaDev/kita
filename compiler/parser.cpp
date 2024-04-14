@@ -9,30 +9,43 @@
 #include "expr/expr_binary.h"
 #include "expr/expr_type.h"
 #include "expr/expr_invoke.h"
+#include "expr/expr_func.h"
 
 using namespace std;
 
 void parser::parse() {
     while (!isEOF()) {
-        parse_next();
+        expressions.emplace_back(parse_next());
     }
-}
-
-void parser::parse_next() {
-    vector<unique_ptr<expr_base>> expressions;
-
-    auto &token = next();
-    if (!isEOF()) {
-        if (token->has_type("Class") && next_match("Kita")) {
-            expressions.emplace_back(type_decl(token));
-        } else if (token->has_type("Method")) {
-            expressions.emplace_back(invoke_decl(token));
-        }
-    }
-
     for (auto &expr : expressions) {
         cout << expr->to_string() << endl;
     }
+}
+
+unique_ptr<expr_base> parser::parse_next() {
+    auto &token = next();
+    if (!isEOF()) {
+        if (token->has_type("Class") && next_match("Kita")) {
+            return type_decl(token);
+        } else if (token->has_type("Method")) {
+            return invoke_decl(token);
+        } else if (token->has_type("Function")) {
+            return function_decl();
+        }
+    }
+    throw runtime_error("Unknown token type '" + token->str_repr() + "'");
+}
+
+unique_ptr<expr_func> parser::function_decl() {
+    string function_name = strict_match("Identifier")->value;
+    strict_match("StartBody");
+
+    vector<unique_ptr<expr_base>> func_body;
+    while (!isEOF() && !peek()->has_type("CloseBody")) {
+        func_body.emplace_back(parse_next());
+    }
+    strict_match("CloseBody");
+    return make_unique<expr_func>(function_name, std::move(func_body));
 }
 
 unique_ptr<expr_invoke> parser::invoke_decl(unique_ptr<token>& method_token) {
