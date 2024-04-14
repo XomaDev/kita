@@ -16,7 +16,7 @@ void parser::parse() {
 void parser::parse_next() {
     auto &token = next();
     if (!isEOF()) {
-        if (token->type == "Class" && next_match("Kita")) {
+        if (token->has_type("Class") && next_match("Kita")) {
             type_decl(token);
         }
     }
@@ -42,14 +42,14 @@ void parser::expr_decl() {
 
 unique_ptr<token>& parser::strict_match(const std::string &type) {
     auto &peek_token = next();
-    if (peek_token->type != type) {
-        throw runtime_error("Expected type '" + type + "' but got '" + peek_token->type + "'");
+    if (!peek_token->has_type(type)) {
+        throw runtime_error("Expected type '" + type + "' but got '" + peek_token->types_str_repr() + "'");
     }
     return peek_token;
 }
 
 bool parser::next_match(const string& type) {
-    return tokens[index]->type == type;
+    return tokens[index]->has_type(type);
 }
 
 void parser::skip() {

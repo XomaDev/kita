@@ -4,6 +4,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include "tokenizer.h"
 #include "kita_type.h"
 
@@ -23,8 +24,13 @@ void tokenizer::load_names() {
         if (!getline(file, line)) {
             throw runtime_error("Expected type_name");
         }
-        // cout << type_match << " " << line << endl;
-        static_declaration[type_match] = line;
+        vector<string> types;
+        string a_value;
+        istringstream types_stream(line);
+        while (getline(types_stream, a_value, ':')) {
+            types.emplace_back(a_value);
+        }
+        static_declaration[type_match] = types;
     }
     file.close();
 }
@@ -70,13 +76,13 @@ void tokenizer::parse_alpha() {
     while (!isEOF() && is_alpha(peek())) {
         alpha += (char) next();
     }
-    string type;
+    vector<string> types;
     if (static_declaration.find(alpha) != static_declaration.end()) {
-        type = static_declaration[alpha];
+        types = static_declaration[alpha];
     } else {
-        type = kita_type::Identifier;
+        types.emplace_back(kita_type::Identifier);
     }
-    tokens.emplace_back(new class token(type, alpha));
+    tokens.emplace_back(new class token(types, alpha));
 }
 
 void tokenizer::parse_numeric() {

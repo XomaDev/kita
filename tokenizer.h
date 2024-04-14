@@ -20,7 +20,7 @@ class tokenizer {
     int iter_index = 0;
     const int source_length;
 
-    unordered_map<string, string> static_declaration;
+    unordered_map<string, vector<string>> static_declaration;
 
     void scan_tokens();
 

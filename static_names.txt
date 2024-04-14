@@ -1,8 +1,8 @@
 Int Class
 Bool Class
-disp display
-fn function
-return return
+disp Display:Method
+fn Function
+return Return
 ~ Kita
 : Colon
 _ With
@@ -17,7 +17,7 @@ _ With
 < LesserThan
 = Equals
 ? TernaryQue
-+ Add
-- Negate
-/ Slash
-* Asterisk
++ Add:Binary
+- Negate:Binary
+/ Slash:Binary
+* Asterisk:Binary
