@@ -1,3 +1,0 @@
-/home/kumaraswamy/Documents/kita/cmake-build-debug/CMakeFiles/kita.dir
-/home/kumaraswamy/Documents/kita/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/kumaraswamy/Documents/kita/cmake-build-debug/CMakeFiles/rebuild_cache.dir

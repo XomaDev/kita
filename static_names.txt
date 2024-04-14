@@ -17,7 +17,7 @@ _ With
 < LesserThan
 = Equals
 ? TernaryQue
-+ Add:Binary
-- Negate:Binary
-/ Slash:Binary
-* Asterisk:Binary
++ Add:BinaryOperator
+- Negate:BinaryOperator
+/ Slash:BinaryOperator:Precede
+* Asterisk:BinaryOperator:Precede
