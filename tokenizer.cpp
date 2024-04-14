@@ -76,12 +76,10 @@ void tokenizer::parse_alpha() {
     while (!isEOF() && is_alpha(peek())) {
         alpha += (char) next();
     }
-    vector<string> types;
-    if (static_declaration.find(alpha) != static_declaration.end()) {
-        types = static_declaration[alpha];
-    } else {
-        types.emplace_back(kita_type::Identifier);
-    }
+    vector<string> types =
+            static_declaration.find(alpha) != static_declaration.end()
+            ? static_declaration[alpha]
+            : kita_type::Identifier;
     tokens.emplace_back(new class token(types, alpha));
 }
 

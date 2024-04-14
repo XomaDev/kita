@@ -13,31 +13,17 @@ using namespace std;
 class kita_type {
 
 public:
-    static const string Identifier;
-    static const string IntClass;
-    static const string Display;
+    static const vector<string> Boolean;
+    static const vector<string> Number;
+    static const vector<string> String;
 
-    static const string Number;
-
-    static const string Kita;
-    static const string Colon;
-    static const string Add;
-    static const string Negate;
-    static const string Slash;
-    static const string Asterisk;
+    static const vector<string> Identifier;
 };
 
-const string kita_type::IntClass = "IntClass";
-const string kita_type::Identifier = "Identifier";
-const string kita_type::Display = "Display";
+const vector<string> kita_type::Boolean = {"Boolean", "Value"};
+const vector<string> kita_type::Number = {"Number", "Value"};
+const vector<string> kita_type::String = {"String", "Value"};
 
-const string kita_type::Number = "Number";
-
-const string kita_type::Kita = "Kita";
-const string kita_type::Colon = "Colon";
-const string kita_type::Add = "Add";
-const string kita_type::Negate = "Negate";
-const string kita_type::Slash = "Slash";
-const string kita_type::Asterisk = "Asterisk";
+const vector<string> kita_type::Identifier = {"Identifier", "Value"};
 
 #endif //KITA_KITA_TYPE_H

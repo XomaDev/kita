@@ -3,7 +3,6 @@
 //
 
 #include <algorithm>
-#include <iostream>
 #include "token.h"
 
 using namespace std;
