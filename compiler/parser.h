@@ -13,6 +13,7 @@
 #include "expr/expr_binary.h"
 #include "expr/expr_invoke.h"
 #include "expr/expr_func.h"
+#include "expr/expr_type.h"
 
 class parser {
     int index = 0;
@@ -22,7 +23,9 @@ class parser {
     vector<unique_ptr<expr_base>> expressions;
 
     unique_ptr<expr_base> parse_next();
-    unique_ptr<expr_base> type_decl(unique_ptr<token>& ptr);
+    unique_ptr<expr_type> type_decl(unique_ptr<token>& ptr, bool simple);
+
+    unique_ptr<expr_func> function_decl();
 
     unique_ptr<expr_invoke> invoke_decl(unique_ptr<token>& ptr);
 
@@ -47,8 +50,6 @@ public:
         // constructor initialized
     }
     void parse();
-
-    unique_ptr<expr_func> function_decl();
 };
 
 

@@ -26,7 +26,7 @@ unique_ptr<expr_base> parser::parse_next() {
     auto &token = next();
     if (!isEOF()) {
         if (token->has_type("Class") && next_match("Kita")) {
-            return type_decl(token);
+            return type_decl(token, false);
         } else if (token->has_type("Method")) {
             return invoke_decl(token);
         } else if (token->has_type("Function")) {
@@ -38,6 +38,17 @@ unique_ptr<expr_base> parser::parse_next() {
 
 unique_ptr<expr_func> parser::function_decl() {
     string function_name = strict_match("Identifier")->value;
+
+    vector<unique_ptr<expr_type>> type_args;
+    if (peek()->has_type("Colon")) {
+        skip(); // eat ':'
+        // read function arguments seperated by _
+        type_args.emplace_back(type_decl(next(), true));
+        while (!isEOF() && peek()->first_type == "With") {
+            skip(); // eat '_'
+            type_args.emplace_back(type_decl(next(), true));
+        }
+    }
     strict_match("StartBody");
 
     vector<unique_ptr<expr_base>> func_body;
@@ -45,7 +56,7 @@ unique_ptr<expr_func> parser::function_decl() {
         func_body.emplace_back(parse_next());
     }
     strict_match("CloseBody");
-    return make_unique<expr_func>(function_name, std::move(func_body));
+    return make_unique<expr_func>(function_name, std::move(func_body), std::move(type_args));
 }
 
 unique_ptr<expr_invoke> parser::invoke_decl(unique_ptr<token>& method_token) {
@@ -64,13 +75,13 @@ vector<unique_ptr<expr_base>> parser::multi_expr_read() {
     return args;
 }
 
-unique_ptr<expr_base> parser::type_decl(unique_ptr<token>& class_token) {
+unique_ptr<expr_type> parser::type_decl(unique_ptr<token>& class_token, bool simple) {
     strict_match("Kita");
 
     string class_name = class_token->value;
     string decl_name = strict_match("Identifier")->value;
 
-    if (next_match("Colon")) {
+    if (!simple && next_match("Colon")) {
         // variable declaration
         skip();
         return make_unique<expr_type>(class_name, decl_name, std::move(expr_decl()));

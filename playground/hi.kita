@@ -1,4 +1,3 @@
-fn hewwo {
-    Int~a: 8 + 2
-    disp a _ 0
+fn fib: Int~x _ Int~y {
+    disp x + y
 }
