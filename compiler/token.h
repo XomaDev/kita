@@ -31,7 +31,7 @@ public:
     }
 
     bool has_type(const string& type);
-    string str_repr();
+    string to_string();
 
     string types_str_repr();
 };

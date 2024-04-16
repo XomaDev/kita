@@ -25,21 +25,32 @@ class parser {
     unique_ptr<expr_base> parse_next();
     unique_ptr<expr_type> type_decl(unique_ptr<token>& ptr, bool simple);
 
+    vector<unique_ptr<expr_base>> read_body();
+
+    void if_decl();
+
     unique_ptr<expr_func> function_decl();
 
     unique_ptr<expr_invoke> invoke_decl(unique_ptr<token>& ptr);
 
-    vector<unique_ptr<expr_base>> multi_expr_read();
+    vector<unique_ptr<expr_base>> multi_expr_read(const string& type_delimiter);
 
     unique_ptr<expr_base> expr_decl();
+    unique_ptr<expr_base> expr_relational();
+
+    unique_ptr<expr_base> binary_expr();
+    unique_ptr<expr_base> binary_precede_expr();
+
+//    unique_ptr<expr_base> expr_arithmetic();
     unique_ptr<expr_base> read_expr();
 
-    unique_ptr<expr_binary> expr_binary_decl(unique_ptr<expr_base> ptr);
+
+//    unique_ptr<expr_binary> binary_wrap(unique_ptr<expr_base> left_expr);
 
     unique_ptr<token>& strict_match(const string& type);
     bool next_match(const string& type);
 
-
+    void back();
     void skip();
 
     unique_ptr<token>& next();

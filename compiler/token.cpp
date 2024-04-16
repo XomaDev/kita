@@ -7,7 +7,7 @@
 
 using namespace std;
 
-string token::str_repr() {
+string token::to_string() {
     return "{kita_type='" + types_str_repr() + "' value='" + value + "'}";
 }
 

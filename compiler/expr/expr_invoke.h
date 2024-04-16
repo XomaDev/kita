@@ -25,7 +25,7 @@ class expr_invoke : public expr_base {
 public:
     expr_invoke(const string& method_name, vector<unique_ptr<expr_base>> args)
             : method_name(method_name), args(std::move(args)) {
-        set_display("expr_invoke{method=" + method_name + ", args=" + args_repr() + "}");
+        set_display("invoke{method=" + method_name + ", args=" + args_repr() + "}");
     }
 };
 

@@ -16,7 +16,7 @@ class expr_binary: public expr_base {
 public:
     expr_binary(unique_ptr<token>& _operator, unique_ptr<expr_base> left, unique_ptr<expr_base> right)
             : expr_base(
-                    "expr_binary{op=" + _operator->value + " left=" + left->to_string() + ", right=" + right->to_string() + "}"
+                    "binary{'" + _operator->value + "' left=" + left->to_string() + ", right=" + right->to_string() + "}"
                     ), _operator(std::move(_operator)), left(std::move(left)), right(std::move(right))  {
         // constructor initialized
     }

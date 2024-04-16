@@ -40,7 +40,7 @@ vector<unique_ptr<token>> tokenizer::tokenize() {
         scan_tokens();
     }
     for (const auto &token : tokens) {
-        cout << token->str_repr() << endl;
+        cout << token->to_string() << endl;
     }
     return std::move(tokens);
 }

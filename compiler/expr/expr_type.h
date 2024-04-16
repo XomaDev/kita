@@ -16,7 +16,7 @@ class expr_type : public expr_base {
 public:
     expr_type(const string& class_name, const string& decl_name, unique_ptr<expr_base> expr):
             class_name(class_name), decl_name(decl_name), expr(std::move(expr)) {
-        string display = "expr_type{class=" + class_name + ", name=" + decl_name +
+        string display = "type{class=" + class_name + ", name=" + decl_name +
                 (expr == nullptr ? "" : ", expr=" + expr->to_string())
                 + "}";
         set_display(display);
