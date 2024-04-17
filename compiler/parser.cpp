@@ -28,8 +28,7 @@ unique_ptr<expr_base> parser::parse_next() {
         if (token->has_type("Class") && next_match("Kita")) {
             return type_decl(token, false);
         } else if (token->has_type("IfConditional")) {
-            if_decl();
-            cout << "Token: " << token->to_string() << endl;
+            if_decl(token);
         } else if (token->has_type("Method")) {
             return invoke_decl(token);
         } else if (token->has_type("Function")) {
@@ -39,24 +38,8 @@ unique_ptr<expr_base> parser::parse_next() {
     throw runtime_error("Unknown token type '" + token->to_string() + "'");
 }
 
-void parser::if_decl() {
-    back();
-    for (;;) {
-        auto &ifType = peek();
-        if (!ifType->has_type("IfConditional")) {
-            break;
-        }
-        skip(); // eat 'ifType'
-
-        strict_match("OpenExpr");
-        vector<unique_ptr<expr_base>> args = multi_expr_read("Semicolon");
-        strict_match("CloseExpr");
-
-        vector<unique_ptr<expr_base>> ifBody = read_body();
-
-        cout << "Args: " << args[0]->to_string() << endl;
-        cout << "Body: " << ifBody[0]->to_string() << endl;
-    }
+void parser::if_decl(unique_ptr<token>& if_token) {
+    // TODO: yet
 }
 
 unique_ptr<expr_func> parser::function_decl() {
@@ -94,10 +77,10 @@ unique_ptr<expr_invoke> parser::invoke_decl(unique_ptr<token>& method_token) {
 
 vector<unique_ptr<expr_base>> parser::multi_expr_read(const string& type_delimiter) {
     vector<unique_ptr<expr_base>> args;
-    args.emplace_back(expr_decl());
+    args.emplace_back(parse_expr(0));
     while (!isEOF() && peek()->first_type == type_delimiter) {
         skip(); // eat '_'
-        args.emplace_back(expr_decl());
+        args.emplace_back(parse_expr(0));
     }
     return args;
 }
@@ -112,77 +95,60 @@ unique_ptr<expr_type> parser::type_decl(unique_ptr<token>& class_token, bool sim
     if (!simple && next_match("Colon")) {
         // variable declaration
         skip();
-        return make_unique<expr_type>(class_name, decl_name, std::move(expr_decl()));
+        return make_unique<expr_type>(class_name, decl_name, std::move(parse_expr(0)));
     }
     return make_unique<expr_type>(class_name, decl_name, nullptr);
 }
 
-unique_ptr<expr_base> parser::expr_decl() {
-    auto expr = expr_relational();
+unique_ptr<expr_base> parser::parse_expr(int minPrecedence) {
+    auto left = read_expr();
     while (!isEOF()) {
-        auto &peek_operator = peek();
-        if (peek_operator->has_type("Logical")) {
-            cout << "Peek Operator " << peek_operator->to_string() << endl;
+        auto &token_operator = peek();
+
+        int precedence = operator_precedence(token_operator);
+        if (precedence == -1) {
+            // unknown token reached, return
+            return left;
+        }
+        if (precedence >= minPrecedence) {
             skip();
-            expr = make_unique<expr_binary>(peek_operator, std::move(expr), expr_relational());
+            // * and / are Non-Commute operators, i.e. the order should be preserved
+            auto right= token_operator->has_type("NonCommute")
+                    ? read_expr()
+                    : parse_expr(precedence);
+            left = make_unique<expr_binary>(token_operator, std::move(left), std::move(right));
         } else {
             break;
         }
     }
-    return expr;
+    return left;
 }
 
-unique_ptr<expr_base> parser::expr_relational() {
-    auto expr = binary_expr();
-    while (!isEOF()) {
-        auto &peek_operator = peek();
-        if (peek_operator->has_type("LogicalPrecede")) {
-            cout << "Peek Operator " << peek_operator->to_string() << endl;
-            skip();
-            expr = make_unique<expr_binary>(peek_operator, std::move(expr), binary_expr());
-        } else {
-            break;
-        }
+int parser::operator_precedence(unique_ptr<token> &token_operator) {
+    int precedence = -1;
+    if (token_operator->has_type("Bitwise")) {
+      precedence = 1;
+    } else if (token_operator->has_type("LogicalAndOr")) {
+        precedence = 2;
+    } else if (token_operator->has_type("Equality")) {
+        precedence = 3;
+    } else if (token_operator->has_type("Relational")) {
+        precedence = 4;
+    } else if (token_operator->has_type("BinaryPrecede")) {
+        precedence = 5;
+    } else if (token_operator->has_type("Binary")) {
+        precedence = 6;
     }
-    return expr;
+    return precedence;
 }
 
-unique_ptr<expr_base> parser::binary_expr() {
-    auto expr = binary_precede_expr();
-    while (!isEOF()) {
-        auto &peek_operator = peek();
-        if (peek_operator->has_type("Binary")) {
-            cout << "Peek Operator " << peek_operator->to_string() << endl;
-            skip();
-            expr = make_unique<expr_binary>(peek_operator, std::move(expr), binary_precede_expr());
-        } else {
-            break;
-        }
-    }
-    return expr;
-}
-
-unique_ptr<expr_base> parser::binary_precede_expr() {
-    auto expr = read_expr();
-    while (!isEOF()) {
-        auto &peek_operator = peek();
-        if (peek_operator->has_type("BinaryPrecede")) {
-            cout << "Peek Operator " << peek_operator->to_string() << endl;
-            skip();
-            expr = make_unique<expr_binary>(peek_operator, std::move(expr), read_expr());
-        } else {
-            break;
-        }
-    }
-    return expr;
-}
 
 unique_ptr<expr_base> parser::read_expr() {
     auto &token = next();
     if (token->has_type("Value")) {
         return make_unique<expr_token>(std::move(token));
     } else if (token->has_type("OpenExpr")) {
-        auto expr = expr_decl();
+        auto expr = parse_expr(0);
         strict_match("CloseExpr");
         return expr;
     }

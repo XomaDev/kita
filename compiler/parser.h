@@ -27,7 +27,7 @@ class parser {
 
     vector<unique_ptr<expr_base>> read_body();
 
-    void if_decl();
+    void if_decl(unique_ptr<token>& if_token);
 
     unique_ptr<expr_func> function_decl();
 
@@ -35,17 +35,9 @@ class parser {
 
     vector<unique_ptr<expr_base>> multi_expr_read(const string& type_delimiter);
 
-    unique_ptr<expr_base> expr_decl();
-    unique_ptr<expr_base> expr_relational();
+    unique_ptr<expr_base> parse_expr(int precedence);
 
-    unique_ptr<expr_base> binary_expr();
-    unique_ptr<expr_base> binary_precede_expr();
-
-//    unique_ptr<expr_base> expr_arithmetic();
     unique_ptr<expr_base> read_expr();
-
-
-//    unique_ptr<expr_binary> binary_wrap(unique_ptr<expr_base> left_expr);
 
     unique_ptr<token>& strict_match(const string& type);
     bool next_match(const string& type);
@@ -61,6 +53,8 @@ public:
         // constructor initialized
     }
     void parse();
+
+    static int operator_precedence(unique_ptr<token> &token_operator) ;
 };
 
 

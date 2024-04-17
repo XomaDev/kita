@@ -10,7 +10,6 @@
 #include <utility>
 #include <vector>
 #include <memory>
-#include "expr_base.h"
 #include "expr_type.h"
 
 using namespace std;
@@ -20,9 +19,6 @@ class expr_func : public expr_base {
     vector<unique_ptr<expr_base>> func_body;
     vector<unique_ptr<expr_type>> type_args;
 
-    string args_repr() {
-
-    }
 public:
     explicit expr_func(string func_name, vector<unique_ptr<expr_base>> func_body, vector<unique_ptr<expr_type>> type_args)
             : func_name(std::move(func_name)), func_body(std::move(func_body)), type_args(std::move(type_args)) {
