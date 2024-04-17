@@ -22,9 +22,6 @@ public:
         this->display = std::move(new_display);
     }
 
-    virtual void write() {
-        throw std::runtime_error("write() method is not implemented.");
-    }
     virtual ~expr_base() = default;
 
     string to_string() {

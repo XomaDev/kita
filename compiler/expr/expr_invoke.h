@@ -9,23 +9,16 @@
 #include <vector>
 #include <memory>
 #include "expr_base.h"
+#include "expr_group.h"
 
 class expr_invoke : public expr_base {
     const string method_name;
-    vector<unique_ptr<expr_base>> args;
+    unique_ptr<expr_group> args;
 
-    string args_repr() {
-        string args_expr = "[";
-        for (const unique_ptr<expr_base>& arg : args) {
-            args_expr += arg->to_string() + " ";
-        }
-        args_expr += "]";
-        return args_expr;
-    }
 public:
-    expr_invoke(const string& method_name, vector<unique_ptr<expr_base>> args)
+    expr_invoke(const string& method_name, unique_ptr<expr_group> args)
             : method_name(method_name), args(std::move(args)) {
-        set_display("invoke{method=" + method_name + ", args=" + args_repr() + "}");
+        set_display("invoke{method=" + method_name + ", args=" + this->args->to_string() + "}");
     }
 };
 

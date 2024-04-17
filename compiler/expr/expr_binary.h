@@ -20,9 +20,6 @@ public:
                     ), _operator(std::move(_operator)), left(std::move(left)), right(std::move(right))  {
         // constructor initialized
     }
-    void write() override {
-        cout << "write: expr_binary" << endl;
-    }
 };
 
 #endif //KITA_EXPR_BINARY_H

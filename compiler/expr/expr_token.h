@@ -18,9 +18,6 @@ public:
     explicit expr_token(unique_ptr<token> token) : expr_base(token->value), _token(std::move(token)) {
         // constructor initialized
     }
-    void write() override {
-        cout << "write: expr_token" << endl;
-    }
 };
 
 

@@ -39,13 +39,13 @@ unique_ptr<expr_base> parser::parse_next() {
 }
 
 void parser::if_decl(unique_ptr<token>& if_token) {
-    // TODO: yet
+
 }
 
 unique_ptr<expr_func> parser::function_decl() {
     string function_name = strict_match("Identifier")->value;
 
-    vector<unique_ptr<expr_type>> type_args;
+    vector<unique_ptr<expr_base>> type_args;
     if (peek()->has_type("Colon")) {
         skip(); // eat ':'
         // read function arguments seperated by _
@@ -55,34 +55,35 @@ unique_ptr<expr_func> parser::function_decl() {
             type_args.emplace_back(type_decl(next(), true));
         }
     }
-    vector<unique_ptr<expr_base>> func_body = read_body();
-    return make_unique<expr_func>(function_name, std::move(func_body), std::move(type_args));
+    auto type_args_group = make_unique<expr_group>(std::move(type_args));
+    auto func_body = read_body();
+    return make_unique<expr_func>(function_name, std::move(func_body), std::move(type_args_group));
 }
 
-vector<unique_ptr<expr_base>> parser::read_body() {
+unique_ptr<expr_group> parser::read_body() {
     strict_match("StartBody");
     vector<unique_ptr<expr_base>> func_body;
     while (!isEOF() && !peek()->has_type("CloseBody")) {
         func_body.emplace_back(parse_next());
     }
     strict_match("CloseBody");
-    return func_body;
+    return make_unique<expr_group>(std::move(func_body));
 }
 
 unique_ptr<expr_invoke> parser::invoke_decl(unique_ptr<token>& method_token) {
     string method_name = method_token->value;
-    vector<unique_ptr<expr_base>> args = multi_expr_read("With");
+    auto args = multi_expr_read("With");
     return make_unique<expr_invoke>(method_name, std::move(args));
 }
 
-vector<unique_ptr<expr_base>> parser::multi_expr_read(const string& type_delimiter) {
+unique_ptr<expr_group> parser::multi_expr_read(const string& type_delimiter) {
     vector<unique_ptr<expr_base>> args;
     args.emplace_back(parse_expr(0));
     while (!isEOF() && peek()->first_type == type_delimiter) {
         skip(); // eat '_'
         args.emplace_back(parse_expr(0));
     }
-    return args;
+    return make_unique<expr_group>(std::move(args));
 }
 
 unique_ptr<expr_type> parser::type_decl(unique_ptr<token>& class_token, bool simple) {

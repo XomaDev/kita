@@ -25,7 +25,7 @@ class parser {
     unique_ptr<expr_base> parse_next();
     unique_ptr<expr_type> type_decl(unique_ptr<token>& ptr, bool simple);
 
-    vector<unique_ptr<expr_base>> read_body();
+    unique_ptr<expr_group> read_body();
 
     void if_decl(unique_ptr<token>& if_token);
 
@@ -33,7 +33,7 @@ class parser {
 
     unique_ptr<expr_invoke> invoke_decl(unique_ptr<token>& ptr);
 
-    vector<unique_ptr<expr_base>> multi_expr_read(const string& type_delimiter);
+    unique_ptr<expr_group> multi_expr_read(const string& type_delimiter);
 
     unique_ptr<expr_base> parse_expr(int precedence);
 
