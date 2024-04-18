@@ -33,13 +33,18 @@ unique_ptr<expr_base> parser::parse_next() {
             return invoke_decl(token);
         } else if (token->has_type("Function")) {
             return function_decl();
+        } else {
+            back();
+            return parse_expr(0);
         }
     }
     throw runtime_error("Unknown token type '" + token->to_string() + "'");
 }
 
 void parser::if_decl(unique_ptr<token>& if_token) {
-
+    strict_match("OpenExpr");
+    auto logical_expressions = multi_expr_read("Semicolon");
+    strict_match("CloseExpr");
 }
 
 unique_ptr<expr_func> parser::function_decl() {
@@ -56,8 +61,18 @@ unique_ptr<expr_func> parser::function_decl() {
         }
     }
     auto type_args_group = make_unique<expr_group>(std::move(type_args));
-    auto func_body = read_body();
-    return make_unique<expr_func>(function_name, std::move(func_body), std::move(type_args_group));
+
+    bool inline_expr = false;
+    unique_ptr<expr_group> func_body;
+    if (peek()->has_type("Assignment")) {
+        // inline return expression assignment
+        skip();
+        func_body = expr_group::singleton(parse_next());
+        inline_expr = true;
+    } else {
+        func_body = read_body();
+    }
+    return make_unique<expr_func>(function_name, inline_expr, std::move(func_body), std::move(type_args_group));
 }
 
 unique_ptr<expr_group> parser::read_body() {

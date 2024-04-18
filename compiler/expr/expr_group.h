@@ -22,6 +22,12 @@ public:
         body_expr += "]";
         set_display(body_expr);
     }
+
+    static unique_ptr<expr_group> singleton(unique_ptr<expr_base> expr) {
+        vector<unique_ptr<expr_base>> single_expr;
+        single_expr.emplace_back(std::move(expr));
+        return make_unique<expr_group>(std::move(single_expr));
+    }
 };
 
 #endif
