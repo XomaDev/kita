@@ -1,3 +1,2 @@
-fn hello: Int~x {
-    disp a + b
-}
+Int~x: if ( x ) 8 else 8 + ( 2 * 4)
+disp if ( x == 8 && x < 2 + 3 && 3 + 3 > 3 ) 8 else 9

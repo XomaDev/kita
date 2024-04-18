@@ -27,7 +27,7 @@ class parser {
 
     unique_ptr<expr_group> read_body();
 
-    void if_decl(unique_ptr<token>& if_token);
+    unique_ptr<expr_base> if_decl(unique_ptr<token>& if_token);
 
     unique_ptr<expr_func> function_decl();
 

@@ -10,6 +10,8 @@
 #include "expr/expr_type.h"
 #include "expr/expr_invoke.h"
 #include "expr/expr_func.h"
+#include "expr/expr_if.h"
+#include "expr/expr_inlineif.h"
 
 using namespace std;
 
@@ -28,23 +30,47 @@ unique_ptr<expr_base> parser::parse_next() {
         if (token->has_type("Class") && next_match("Kita")) {
             return type_decl(token, false);
         } else if (token->has_type("IfConditional")) {
-            if_decl(token);
+            return if_decl(token);
         } else if (token->has_type("Method")) {
             return invoke_decl(token);
         } else if (token->has_type("Function")) {
             return function_decl();
-        } else {
-            back();
-            return parse_expr(0);
         }
     }
-    throw runtime_error("Unknown token type '" + token->to_string() + "'");
+    back();
+    return parse_expr(0);
 }
 
-void parser::if_decl(unique_ptr<token>& if_token) {
+unique_ptr<expr_base> parser::if_decl(unique_ptr<token>& if_token) {
+    // right now, we only implement simple type of if expression
+    // ifall, ifnone, ifany are not yet supported
+
     strict_match("OpenExpr");
     auto logical_expressions = multi_expr_read("Semicolon");
     strict_match("CloseExpr");
+
+    if (next_match("StartBody")) {
+        unique_ptr<expr_group> if_expr = read_body();
+        unique_ptr<expr_group> else_expr = nullptr;
+
+        if (!isEOF() && next_match("Else")) {
+            skip(); // eat 'Else'
+            if (next_match("StartBody")) {
+                else_expr = read_body();
+            } else if (next_match("If")) {
+                else_expr = expr_group::singleton(if_decl(next()));
+            } else {
+                throw runtime_error("Expected body for else statement");
+            }
+            return make_unique<expr_if>(std::move(logical_expressions), std::move(if_expr), std::move(else_expr));
+        }
+    } else {
+        unique_ptr<expr_base> if_expr = parse_next();
+        strict_match("Else");
+        unique_ptr<expr_base> else_expr = parse_next();
+
+        return make_unique<expr_inlineif>(std::move(logical_expressions), std::move(if_expr), std::move(else_expr));
+    }
 }
 
 unique_ptr<expr_func> parser::function_decl() {
@@ -93,10 +119,10 @@ unique_ptr<expr_invoke> parser::invoke_decl(unique_ptr<token>& method_token) {
 
 unique_ptr<expr_group> parser::multi_expr_read(const string& type_delimiter) {
     vector<unique_ptr<expr_base>> args;
-    args.emplace_back(parse_expr(0));
+    args.emplace_back(parse_next());
     while (!isEOF() && peek()->first_type == type_delimiter) {
         skip(); // eat '_'
-        args.emplace_back(parse_expr(0));
+        args.emplace_back(parse_next());
     }
     return make_unique<expr_group>(std::move(args));
 }
@@ -110,7 +136,7 @@ unique_ptr<expr_type> parser::type_decl(unique_ptr<token>& class_token, bool sim
     if (!simple && next_match("Colon")) {
         // variable declaration
         skip();
-        return make_unique<expr_type>(class_name, decl_name, std::move(parse_expr(0)));
+        return make_unique<expr_type>(class_name, decl_name, std::move(parse_next()));
     }
     return make_unique<expr_type>(class_name, decl_name, nullptr);
 }
@@ -163,7 +189,7 @@ unique_ptr<expr_base> parser::read_expr() {
     if (token->has_type("Value")) {
         return make_unique<expr_token>(std::move(token));
     } else if (token->has_type("OpenExpr")) {
-        auto expr = parse_expr(0);
+        auto expr = parse_next();
         strict_match("CloseExpr");
         return expr;
     }
