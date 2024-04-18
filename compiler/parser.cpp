@@ -64,7 +64,7 @@ unique_ptr<expr_func> parser::function_decl() {
 
     bool inline_expr = false;
     unique_ptr<expr_group> func_body;
-    if (peek()->has_type("Assignment")) {
+    if (next_match("Assignment")) {
         // inline return expression assignment
         skip();
         func_body = expr_group::singleton(parse_next());
@@ -78,7 +78,7 @@ unique_ptr<expr_func> parser::function_decl() {
 unique_ptr<expr_group> parser::read_body() {
     strict_match("StartBody");
     vector<unique_ptr<expr_base>> func_body;
-    while (!isEOF() && !peek()->has_type("CloseBody")) {
+    while (!isEOF() && !next_match("CloseBody")) {
         func_body.emplace_back(parse_next());
     }
     strict_match("CloseBody");
@@ -102,7 +102,6 @@ unique_ptr<expr_group> parser::multi_expr_read(const string& type_delimiter) {
 }
 
 unique_ptr<expr_type> parser::type_decl(unique_ptr<token>& class_token, bool simple) {
-    cout << "Class Token " << class_token->to_string() << endl;
     strict_match("Kita");
 
     string class_name = class_token->value;
@@ -180,22 +179,34 @@ unique_ptr<token>& parser::strict_match(const std::string &type) {
 }
 
 bool parser::next_match(const string& type) {
-    return tokens[index]->has_type(type);
+    return peek()->has_type(type);
 }
 
 void parser::back() {
+    if (index == 0) {
+        throw runtime_error("Cant go past 0");
+    }
     index--;
 }
 
 void parser::skip() {
+    if (isEOF()) {
+        throw runtime_error("Already reached EOF");
+    }
     index++;
 }
 
 unique_ptr<token>& parser::peek() {
+    if (isEOF()) {
+        throw runtime_error("Reached EOF");
+    }
     return tokens[index];
 }
 
 unique_ptr<token>& parser::next() {
+    if (isEOF()) {
+        throw runtime_error("Reached EOF");
+    }
     return tokens[index++];
 }
 

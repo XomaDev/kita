@@ -1,1 +1,3 @@
-fn hello: Int~x = a + b
+fn hello: Int~x {
+    disp a + b
+}
