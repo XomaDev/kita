@@ -33,6 +33,10 @@ class parser {
 
     unique_ptr<expr_group> multi_expr_read(const string& type_delimiter);
 
+    static int operator_precedence(unique_ptr<token> &token_operator) ;
+
+    unique_ptr<expr_group> read_invoke_args(const string &type_delimiter);
+
     unique_ptr<expr_base> parse_expr(int precedence);
 
     unique_ptr<expr_base> read_expr();
@@ -53,8 +57,6 @@ public:
         // constructor initialized
     }
     void parse();
-
-    static int operator_precedence(unique_ptr<token> &token_operator) ;
 };
 
 

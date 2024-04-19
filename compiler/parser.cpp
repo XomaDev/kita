@@ -111,8 +111,28 @@ unique_ptr<expr_group> parser::read_body() {
 
 unique_ptr<expr_invoke> parser::invoke_decl(unique_ptr<token>& method_token) {
     string method_name = method_token->value;
-    auto args = multi_expr_read("With");
+    unique_ptr<expr_group> args = read_invoke_args("With");
     return make_unique<expr_invoke>(method_name, std::move(args));
+}
+
+unique_ptr<expr_group> parser::read_invoke_args(const string& type_delimiter) {
+    unique_ptr<expr_group> args;
+    auto &peek_token = peek();
+
+    if (peek_token->has_type("OpenExpr")) {
+        skip(); // eat '('
+        args = multi_expr_read(type_delimiter);
+        strict_match("CloseExpr");
+    } else if (peek_token->has_type("StartBody")) {
+        throw runtime_error("Expected '(' and not '{'");
+        // maybe we could include new features in future
+        // skip(); // eat '{'
+        // args = multi_expr_read(type_delimiter);
+        // strict_match("CloseBody");
+    } else {
+        return multi_expr_read(type_delimiter);
+    }
+    return args;
 }
 
 unique_ptr<expr_group> parser::multi_expr_read(const string& type_delimiter) {
@@ -190,6 +210,10 @@ unique_ptr<expr_base> parser::read_expr() {
         auto expr = parse_next();
         strict_match("CloseExpr");
         return expr;
+    } else if (token->has_type("StartBody")) {
+        back();
+        auto inline_body = read_body();
+        return inline_body;
     }
     throw runtime_error("Unknown type, not handled '" + token->types_str_repr() + "'");
 }
