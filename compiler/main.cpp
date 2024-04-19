@@ -18,8 +18,8 @@ string read_string(string &file_path) {
 }
 
 int main() {
-    string static_names = "/home/kumaraswamy/Documents/kita/config/static_names.txt";
-    string source_file = "/home/kumaraswamy/Documents/kita/playground/hi.kita";
+    string static_names = "/home/kumaraswamy/Documents/project_kita/kiita/config/static_names.txt";
+    string source_file = "/home/kumaraswamy/Documents/project_kita/kiita/playground/hi.kita";
 
     string source = read_string(source_file);
     cout << source << endl << endl;

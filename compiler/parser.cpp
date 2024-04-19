@@ -173,9 +173,9 @@ int parser::operator_precedence(unique_ptr<token> &token_operator) {
         precedence = 3;
     } else if (token_operator->has_type("Relational")) {
         precedence = 4;
-    } else if (token_operator->has_type("BinaryPrecede")) {
-        precedence = 5;
     } else if (token_operator->has_type("Binary")) {
+        precedence = 5;
+    } else if (token_operator->has_type("BinaryPrecede")) {
         precedence = 6;
     }
     return precedence;
