@@ -34,6 +34,10 @@ int main() {
     auto parser = new class parser(std::move(tokens));
     parser->parse();
 
+    for (auto &expr : parser->expressions) {
+        cout << expr->to_string() << endl;
+    }
+
     delete parser;
     return 0;
 }

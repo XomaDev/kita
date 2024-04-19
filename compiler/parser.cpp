@@ -19,9 +19,7 @@ void parser::parse() {
     while (!isEOF()) {
         expressions.emplace_back(parse_next());
     }
-    for (auto &expr : expressions) {
-        cout << expr->to_string() << endl;
-    }
+
 }
 
 unique_ptr<expr_base> parser::parse_next() {

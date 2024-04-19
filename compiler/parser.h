@@ -20,8 +20,6 @@ class parser {
     const int size;
     vector<unique_ptr<token>> tokens;
 
-    vector<unique_ptr<expr_base>> expressions;
-
     unique_ptr<expr_base> parse_next();
     unique_ptr<expr_type> type_decl(unique_ptr<token>& ptr, bool simple);
 
@@ -49,6 +47,8 @@ class parser {
     unique_ptr<token>& peek();
     bool isEOF() const;
 public:
+    vector<unique_ptr<expr_base>> expressions;
+
     explicit parser(vector<unique_ptr<token>> tokens) : size(tokens.size()), tokens(std::move(tokens)) {
         // constructor initialized
     }
