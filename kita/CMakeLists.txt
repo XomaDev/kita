@@ -25,4 +25,5 @@ add_executable(kita main.cpp
         compiler/dump.cpp
         runtime/runtime.cpp
         runtime/runtime.h
+        runtime/stack_type.h
 )

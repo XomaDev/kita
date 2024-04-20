@@ -7,7 +7,9 @@
 
 #include <memory>
 #include <vector>
+#include <array>
 #include <id3/globals.h>
+#include "stack_type.h"
 
 using namespace std;
 
@@ -19,13 +21,15 @@ class runtime {
 
     // philosophy: do not include intermediate EOF checks that may make
     // execution a bit slower, assuming bytecode is absolutely right
-    uchar next();
-    uchar peek();
 
-    bool isEOF();
+    string read_name();
 
-    vector<int> main_stack;
-    long stack_index;
+    uchar advance();
+
+    [[nodiscard]] bool isEOF() const;
+
+    vector<array<int, 2>> main_stack;
+    long stack_index = 0;
 
     void exec_next();
     void load();
@@ -33,10 +37,15 @@ class runtime {
     void binary_operation();
     void invoke();
 
-    int back_stack(int n);
+    void declare();
 
-    void push(int n);
-    int pop();
+    void assert_last_stack(stack_type expect_type);
+
+    void push_int(int n);
+    void push(stack_type type, int n);
+
+    int pop_int();
+    array<int, 2> pop();
 public:
     runtime(unique_ptr<uchar[]> bytes, long length) : bytes(std::move(bytes)), length(length) {
         // constructor initialized
