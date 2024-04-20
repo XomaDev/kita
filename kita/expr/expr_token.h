@@ -6,7 +6,7 @@
 #define KITA_EXPR_TOKEN_H
 
 #include <memory>
-#include "../token.h"
+#include "../compiler/token.h"
 #include "expr_base.h"
 
 

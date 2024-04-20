@@ -9,11 +9,11 @@
 #include <utility>
 #include <vector>
 #include "token.h"
-#include "expr/expr_base.h"
-#include "expr/expr_binary.h"
-#include "expr/expr_invoke.h"
-#include "expr/expr_func.h"
-#include "expr/expr_type.h"
+#include "../expr/expr_base.h"
+#include "../expr/expr_binary.h"
+#include "../expr/expr_invoke.h"
+#include "../expr/expr_func.h"
+#include "../expr/expr_type.h"
 
 class parser {
     int index = 0;

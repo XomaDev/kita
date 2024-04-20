@@ -8,8 +8,8 @@
 #include <memory>
 #include <utility>
 #include "expr_base.h"
-#include "../token.h"
-#include "../dump.h"
+#include "../compiler/token.h"
+#include "../compiler/dump.h"
 
 class expr_binary: public expr_base {
     const unique_ptr<token>& _operator;

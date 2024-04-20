@@ -1,8 +1,8 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
-#include "tokenizer.h"
-#include "parser.h"
+#include "compiler/tokenizer.h"
+#include "compiler/parser.h"
 
 using namespace std;
 

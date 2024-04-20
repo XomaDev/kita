@@ -4,13 +4,13 @@ project(kita)
 set(CMAKE_CXX_STANDARD 17)
 
 add_executable(kita main.cpp
-        tokenizer.cpp
-        tokenizer.h
-        token.cpp
-        token.h
-        kita_type.h
-        parser.cpp
-        parser.h
+        compiler/tokenizer.cpp
+        compiler/tokenizer.h
+        compiler/token.cpp
+        compiler/token.h
+        compiler/kita_type.h
+        compiler/parser.cpp
+        compiler/parser.h
         expr/expr_base.h
         expr/expr_token.h
         expr/expr_binary.h
@@ -19,8 +19,8 @@ add_executable(kita main.cpp
         expr/expr_func.h
         expr/expr_group.h
         expr/expr_inlineif.h
-        bytecode.h
-        dump.cpp
-        dump.h
-        dump.cpp
+        compiler/bytecode.h
+        compiler/dump.cpp
+        compiler/dump.h
+        compiler/dump.cpp
 )
