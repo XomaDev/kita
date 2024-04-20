@@ -14,8 +14,9 @@ enum class bytecode {
 
     // instruction types
     LOAD = 11,
-    INVOKE = 12,
-    DECLARE = 13,
+    BINARY_OP = 12,
+    INVOKE = 13,
+    DECLARE = 14,
 
     // declaration class types
     BOOL_CLASS = 21,

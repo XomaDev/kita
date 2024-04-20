@@ -10,7 +10,7 @@
 #include <memory>
 #include "expr_base.h"
 #include "expr_group.h"
-#include "../compiler/dump.h"
+#include "../dump.h"
 
 class expr_invoke : public expr_base {
     const string method_name;

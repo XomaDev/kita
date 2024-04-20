@@ -8,8 +8,8 @@
 #include <memory>
 #include <utility>
 #include "expr_base.h"
-#include "../compiler/token.h"
-#include "../compiler/dump.h"
+#include "../token.h"
+#include "../dump.h"
 
 class expr_binary: public expr_base {
     const unique_ptr<token>& _operator;
@@ -33,6 +33,8 @@ public:
             right->dump(pDump);
             left->dump(pDump);
         }
+
+        pDump->write(bytecode::BINARY_OP);
 
         auto code = this->_operator->value;
         if (code == "+") {

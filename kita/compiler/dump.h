@@ -11,7 +11,7 @@
 #include <vector>
 #include <fstream>
 #include "bytecode.h"
-#include "../expr/expr_base.h"
+#include "expr/expr_base.h"
 
 using namespace std;
 

@@ -4,14 +4,14 @@
 
 #include <iostream>
 #include "parser.h"
-#include "../expr/expr_base.h"
-#include "../expr/expr_token.h"
-#include "../expr/expr_binary.h"
-#include "../expr/expr_type.h"
-#include "../expr/expr_invoke.h"
-#include "../expr/expr_func.h"
-#include "../expr/expr_if.h"
-#include "../expr/expr_inlineif.h"
+#include "expr/expr_base.h"
+#include "expr/expr_token.h"
+#include "expr/expr_binary.h"
+#include "expr/expr_type.h"
+#include "expr/expr_invoke.h"
+#include "expr/expr_func.h"
+#include "expr/expr_if.h"
+#include "expr/expr_inlineif.h"
 
 using namespace std;
 

@@ -11,16 +11,18 @@ add_executable(kita main.cpp
         compiler/kita_type.h
         compiler/parser.cpp
         compiler/parser.h
-        expr/expr_base.h
-        expr/expr_token.h
-        expr/expr_binary.h
-        expr/expr_type.h
-        expr/expr_invoke.h
-        expr/expr_func.h
-        expr/expr_group.h
-        expr/expr_inlineif.h
+        compiler/expr/expr_base.h
+        compiler/expr/expr_token.h
+        compiler/expr/expr_binary.h
+        compiler/expr/expr_type.h
+        compiler/expr/expr_invoke.h
+        compiler/expr/expr_func.h
+        compiler/expr/expr_group.h
+        compiler/expr/expr_inlineif.h
         compiler/bytecode.h
         compiler/dump.cpp
         compiler/dump.h
         compiler/dump.cpp
+        runtime/runtime.cpp
+        runtime/runtime.h
 )

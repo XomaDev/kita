@@ -1,8 +1,10 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <id3/globals.h>
 #include "compiler/tokenizer.h"
 #include "compiler/parser.h"
+#include "runtime/runtime.h"
 
 using namespace std;
 
@@ -15,6 +17,23 @@ string read_string(string &file_path) {
     buffer << file.rdbuf();
     file.close();
     return buffer.str();
+}
+
+unique_ptr<uchar[]> read_bytes(const string& path, long& file_size) {
+    ifstream file(path, ios::binary | ios::ate);
+    if (!file) {
+        throw runtime_error("Could not open file " + path);
+    }
+    file_size = file.tellg();
+    file.seekg(0, ios::beg);
+
+    // auto *buffer = new uchar[file_size];
+    auto buffer = make_unique<uchar[]>(file_size);
+
+    if (!file.read(reinterpret_cast<char *>(buffer.get()), file_size)) {
+        throw runtime_error("Error reading file " + path);
+    }
+    return buffer;
 }
 
 int main() {
@@ -39,5 +58,13 @@ int main() {
 
     delete parser;
     delete dump;
+
+    long file_size;
+    auto bytes = read_bytes(compiled_file, file_size);
+
+    auto runtime = new class runtime(std::move(bytes), file_size);
+    runtime->run();
+
+    delete runtime;
     return 0;
 }

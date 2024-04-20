@@ -7,7 +7,7 @@
 
 #include <string>
 #include <utility>
-#include "../compiler/dump.h"
+#include "../dump.h"
 
 using namespace std;
 
