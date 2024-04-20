@@ -19,7 +19,8 @@ string read_string(string &file_path) {
 
 int main() {
     string static_names = "/home/kumaraswamy/Documents/project_kita/kiita/config/static_names.txt";
-    string source_file = "/home/kumaraswamy/Documents/project_kita/kiita/playground/hi.kita";
+    string source_file = "/home/kumaraswamy/Documents/project_kita/kiita/imagine/hi.kita";
+    string compiled_file = "/home/kumaraswamy/Documents/project_kita/kiita/imagine/hi.ki";
 
     string source = read_string(source_file);
     cout << source << endl << endl;
@@ -34,10 +35,9 @@ int main() {
     auto parser = new class parser(std::move(tokens));
     parser->parse();
 
-    for (auto &expr : parser->expressions) {
-        cout << expr->to_string() << endl;
-    }
+    auto dump = new class dump(compiled_file, std::move(parser->expressions));
 
     delete parser;
+    delete dump;
     return 0;
 }

@@ -28,6 +28,16 @@ public:
         single_expr.emplace_back(std::move(expr));
         return make_unique<expr_group>(std::move(single_expr));
     }
+
+    void dump(class dump *pDump) override {
+        for (auto &expr: exprs) {
+            expr->dump(pDump);
+        }
+    }
+
+    bool is_leaf() override {
+        return false;
+    }
 };
 
 #endif

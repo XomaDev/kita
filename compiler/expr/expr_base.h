@@ -7,8 +7,11 @@
 
 #include <string>
 #include <utility>
+#include "../dump.h"
 
 using namespace std;
+
+class dump;
 
 class expr_base {
     string display;
@@ -26,6 +29,19 @@ public:
 
     string to_string() {
         return display;
+    }
+
+    virtual void dump(dump *pDump) {
+        throw runtime_error("not implemented");
+    }
+
+    virtual bool is_leaf() {
+        // if there are no further member evaluations
+        // my concept of stack optimization
+
+        // [load 1, load 2, load 7, *, + ]
+        // better: [load 7, load 2, *, load 1, + ]
+        throw runtime_error("not implemented");
     }
 };
 

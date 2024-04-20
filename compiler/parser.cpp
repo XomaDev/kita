@@ -62,6 +62,7 @@ unique_ptr<expr_base> parser::if_decl(unique_ptr<token>& if_token) {
             }
             return make_unique<expr_if>(std::move(logical_expressions), std::move(if_expr), std::move(else_expr));
         }
+        return make_unique<expr_if>(std::move(logical_expressions), std::move(if_expr), nullptr);
     } else {
         unique_ptr<expr_base> if_expr = parse_next();
         strict_match("Else");

@@ -1,4 +1,0 @@
-disp (y * 3 / {
-        Int~x: y * 3
-        if ( x == 12 ) 8 else 2
-     })

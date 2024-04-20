@@ -1,0 +1,38 @@
+1 + 2 * 3
+invoke{method=disp, args=[binary{'+' left=1, right=binary{'*' left=2, right=3}} ]}
+
+[+, left=1, right={*, left=2, right=3}]
+
+token { 3 }
+evaluate { *, 2 }
+evaluate { +, 1 }
+disp
+
+---------------------------------------------------
+
+disp (y * 3 / {
+        Int~x: y * 3
+        if ( x == 12 ) 8 else 2
+     })
+
+invoke{method=disp, args=[binary{'/' left=binary{'*' left=y, right=3}, right=[type{class=Int, name=x, expr=binary{'*' left=y, right=3}}
+inline_if{conditions=[binary{'==' left=x, right=12} ], if=8, else=2 ]} ]}
+
+
+[section_#0fxd]
+    token { y }
+    token { 3 }
+    eval { * }
+    decl Int x
+
+    token { x }
+    token { 12 }
+    eval { == }
+    cmp { 8, 2 }
+
+token { y }
+token { 3 }
+eval { * }
+invoke #0fxd
+eval { / }
+
