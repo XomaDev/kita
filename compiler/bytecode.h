@@ -6,17 +6,40 @@
 #define KITA_BYTECODE_H
 
 enum class bytecode {
-    IntType = 0,
+    // value types
+    BOOL_TYPE = 0,
+    INT_TYPE = 1,
+    NAME_TYPE = 2,
+    STRING = 3,
 
+    // instruction types
     LOAD = 11,
     INVOKE = 12,
+    DECLARE = 13,
 
-    ADD = 21,
-    NEG = 22,
-    MUL = 23,
-    DIV = 24,
+    // declaration class types
+    BOOL_CLASS = 21,
+    INT_CLASS = 22,
 
-    DISP = 40,
+    // binary instructions
+    ADD = 31,
+    NEG = 32,
+    MUL = 33,
+    DIV = 34,
+
+    LOGICAL_AND = 35,
+    LOGICAL_OR = 36,
+    BITWISE_AND = 37,
+    BITWISE_OR = 38,
+    EQUALS = 39,
+    NOT_EQUALS = 40,
+    GREATER_THAN = 41,
+    LESSER_THAN = 42,
+    GREATER_EQUALS = 43,
+    LESSER_EQUALS = 44,
+
+
+    DISP = 50,
 };
 
 #endif //KITA_BYTECODE_H

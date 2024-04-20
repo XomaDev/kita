@@ -9,8 +9,8 @@
 #include "expr_base.h"
 
 class expr_type : public expr_base {
-    const string& class_name;
-    const string& decl_name;
+    const string class_name;
+    const string decl_name;
 
     unique_ptr<expr_base> expr;
 public:
@@ -20,6 +20,23 @@ public:
                 (this->expr == nullptr ? "" : ", expr=" + this->expr->to_string())
                 + "}";
         set_display(display);
+    }
+
+    void dump(class dump *pDump) override {
+        expr->dump(pDump);
+        pDump->write(bytecode::DECLARE);
+        if (class_name == "Int") {
+            pDump->write(bytecode::INT_CLASS);
+        } else if (class_name == "Bool") {
+            pDump->write(bytecode::BOOL_CLASS);
+        } else {
+            throw runtime_error("Unknown class name '" + class_name + "'");
+        }
+        pDump->write_name(decl_name);
+    }
+
+    bool is_leaf() override {
+        return false;
     }
 };
 

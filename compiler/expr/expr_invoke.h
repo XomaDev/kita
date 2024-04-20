@@ -25,6 +25,8 @@ public:
     void dump(class dump *pDump) override {
         args->dump(pDump);
         pDump->write(bytecode::INVOKE);
+        pDump->write_uint8(args->args_size);
+
         if (method_name == "disp") {
             pDump->write(bytecode::DISP);
         }

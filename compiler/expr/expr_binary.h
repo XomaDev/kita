@@ -23,13 +23,17 @@ public:
     }
 
     void dump(class dump *pDump) override {
-        if (left->is_leaf()) {
-            right->dump(pDump);
-            left->dump(pDump);
-        } else {
+        if (left->is_leaf() && right->is_leaf() || !left->is_leaf()) {
+            // both leaves or left is leaf
             left->dump(pDump);
             right->dump(pDump);
+        } else if (left->is_leaf() && !right->is_leaf()){
+            // right is leaf
+            // [1, add[2, 3]]
+            right->dump(pDump);
+            left->dump(pDump);
         }
+
         auto code = this->_operator->value;
         if (code == "+") {
             pDump->write(bytecode::ADD);
@@ -39,6 +43,26 @@ public:
             pDump->write(bytecode::MUL);
         } else if (code == "/") {
             pDump->write(bytecode::DIV);
+        } else if (code == "&") {
+            pDump->write(bytecode::BITWISE_AND);
+        } else if (code == "|") {
+            pDump->write(bytecode::BITWISE_OR);
+        } else if (code == "&&") {
+            pDump->write(bytecode::LOGICAL_AND);
+        } else if (code == "||") {
+            pDump->write(bytecode::LOGICAL_OR);
+        } else if (code == "==") {
+            pDump->write(bytecode::EQUALS);
+        } else if (code == "!=") {
+            pDump->write(bytecode::NOT_EQUALS);
+        } else if (code == ">") {
+            pDump->write(bytecode::GREATER_THAN);
+        } else if (code == "<") {
+            pDump->write(bytecode::LESSER_THAN);
+        } else if (code == ">=") {
+            pDump->write(bytecode::GREATER_EQUALS);
+        } else if (code == "<=") {
+            pDump->write(bytecode::LESSER_EQUALS);
         } else {
             throw runtime_error("Unknown operator " + _operator->to_string());
         }

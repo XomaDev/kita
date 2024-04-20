@@ -27,6 +27,10 @@ public:
     void write(bytecode b);
 
     void write_int(int n);
+
+    void write_name(string name);
+
+    void write_uint8(uint8_t b);
 };
 
 

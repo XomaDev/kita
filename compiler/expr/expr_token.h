@@ -20,9 +20,15 @@ public:
     }
 
     void dump(class dump *pDump) override {
+        pDump->write(bytecode::LOAD);
         if (_token->first_type == "Number") {
-            pDump->write(bytecode::LOAD);
+            pDump->write(bytecode::INT_TYPE);
             pDump->write_int(stoi(_token->value));
+        } else if (_token->first_type == "Identifier") {
+            pDump->write(bytecode::NAME_TYPE);
+            pDump->write_name(_token->value);
+        } else {
+            throw runtime_error("Unknown token type " + _token->to_string());
         }
     }
 

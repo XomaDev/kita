@@ -22,4 +22,5 @@ add_executable(kita main.cpp
         bytecode.h
         dump.cpp
         dump.h
+        dump.cpp
 )

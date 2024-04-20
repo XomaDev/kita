@@ -1,1 +1,2 @@
-disp 1 + 2 * 7
+Int~a: 1 + 2 * 3
+disp a + 2
