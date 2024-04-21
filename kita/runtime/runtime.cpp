@@ -80,17 +80,17 @@ void runtime::binary_operation() {
             break;
         }
         case bytecode::NEG: {
-            int r = stack.pop_int(), l = stack.pop_int();
+            auto r = stack.pop_int(), l = stack.pop_int();
             stack.push_int(l - r);
             break;
         }
         case bytecode::MUL: {
-            int r = stack.pop_int(), l = stack.pop_int();
+            auto r = stack.pop_int(), l = stack.pop_int();
             stack.push_int(l * r);
             break;
         }
         case bytecode::DIV: {
-            int r = stack.pop_int(), l = stack.pop_int();
+            auto r = stack.pop_int(), l = stack.pop_int();
             stack.push_int(l / r);
             break;
         }

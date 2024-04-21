@@ -47,7 +47,7 @@ array<uint64_t, 2> stack_manager::dereference(array<uint64_t, 2> &stack_element)
     }
 }
 
-void stack_manager::push_int(int n) {
+void stack_manager::push_int(int64_t n) {
     push(stack_type::INT, static_cast<uint64_t>(n));
 }
 
@@ -56,7 +56,7 @@ void stack_manager::push(stack_type type, uint64_t n) {
     stack_index++;
 }
 
-int stack_manager::pop_int() {
+int64_t stack_manager::pop_int() {
     auto element = pop_value();
     auto type = static_cast<stack_type>(element[0]);
     if (type == stack_type::INT) {

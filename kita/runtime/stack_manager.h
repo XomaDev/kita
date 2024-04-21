@@ -29,10 +29,10 @@ public:
 
     array<uint64_t, 2> dereference(array<uint64_t, 2> &stack_element);
 
-    void push_int(int n);
+    void push_int(int64_t n);
     void push(stack_type type, uint64_t n);
 
-    int pop_int();
+    int64_t pop_int();
     array<uint64_t, 2> pop_value();
     array<uint64_t, 2> pop();
 };
