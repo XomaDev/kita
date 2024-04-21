@@ -50,6 +50,10 @@ void tokenizer::scan_tokens() {
     if (c == ' ' || c == '\n') {
         return;
     }
+    if (c == '"') {
+        parse_string();
+        return;
+    }
     // go back a bit and try searching
     back();
     string search_str;
@@ -69,6 +73,24 @@ void tokenizer::scan_tokens() {
         auto token = new class token(static_declaration[search_str], search_str);
         tokens.emplace_back(token);
     }
+}
+
+void tokenizer::parse_string() {
+    string content;
+    for (;;) {
+        if (isEOF()) {
+            throw runtime_error("Parse string, reached EOF");
+        }
+        auto next_char = next();
+        if (next_char == '\0') {
+            throw runtime_error("Null characters cannot be included in string");
+        }
+        if (next_char == '"') {
+            break;
+        }
+        content += (char) next_char;
+    }
+    tokens.emplace_back(new class token(kita_type::String, content));
 }
 
 void tokenizer::parse_alpha() {

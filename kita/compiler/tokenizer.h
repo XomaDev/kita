@@ -24,6 +24,7 @@ class tokenizer {
 
     void scan_tokens();
 
+    void parse_string();
     void parse_alpha();
     void parse_numeric();
 

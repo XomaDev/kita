@@ -10,29 +10,31 @@
 #include <id3/globals.h>
 #include <unordered_map>
 #include <string>
+#include <cstdint>
 #include "stack_type.h"
 
 using namespace std;
 
 class stack_manager {
-    vector<array<uint, 2>> main_stack;
-    unordered_map<string, uint> addr_map;
+    vector<array<uint64_t, 2>> main_stack;
+    unordered_map<string, uint64_t> addr_map;
 
 public:
-    uint stack_index = 0;
+    uint64_t stack_index = 0;
 
     void move_addr(const string &name, bool overwrite);
-    uint access_addr(const string &name);
+    uint64_t access_addr(const string &name);
 
-    uint assert_last_stack(stack_type expect_type);
+    uint64_t assert_last_stack(stack_type expect_type);
 
-    array<uint, 2> dereference(array<uint, 2> &stack_element);
+    array<uint64_t, 2> dereference(array<uint64_t, 2> &stack_element);
 
     void push_int(int n);
-    void push(stack_type type, uint n);
+    void push(stack_type type, uint64_t n);
 
     int pop_int();
-    array<uint, 2> pop();
+    array<uint64_t, 2> pop_value();
+    array<uint64_t, 2> pop();
 };
 
 

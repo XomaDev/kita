@@ -29,6 +29,8 @@ public:
             pDump->write(bytecode::INT_CLASS);
         } else if (class_name == "Bool") {
             pDump->write(bytecode::BOOL_CLASS);
+        } else if (class_name == "String") {
+            pDump->write(bytecode::STRING_CLASS);
         } else {
             throw runtime_error("Unknown class name '" + class_name + "'");
         }

@@ -1,2 +1,2 @@
-Int~a: 8 + 2
-disp a * 5
+String~a: "hello world"
+disp a + " meow"

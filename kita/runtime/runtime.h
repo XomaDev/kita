@@ -26,7 +26,7 @@ class runtime {
 
     stack_manager stack;
 
-    string read_name();
+    string read_string();
 
     uchar advance();
 
@@ -36,6 +36,10 @@ class runtime {
     void load();
 
     void binary_operation();
+    void binary_addition();
+
+    static const char *element_to_string(array<uint64_t, 2> element);
+
     void invoke();
 
     void declare();

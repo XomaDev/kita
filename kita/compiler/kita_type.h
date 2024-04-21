@@ -13,14 +13,12 @@ using namespace std;
 class kita_type {
 
 public:
-    static const vector<string> Boolean;
     static const vector<string> Number;
     static const vector<string> String;
 
     static const vector<string> Identifier;
 };
 
-const vector<string> kita_type::Boolean = {"Boolean", "Value"};
 const vector<string> kita_type::Number = {"Number", "Value"};
 const vector<string> kita_type::String = {"String", "Value"};
 

@@ -10,7 +10,7 @@ enum class bytecode {
     BOOL_TYPE = 0,
     INT_TYPE = 1,
     NAME_TYPE = 2,
-    STRING = 3,
+    STRING_TYPE = 3,
 
     // instruction types
     LOAD = 11,
@@ -21,6 +21,7 @@ enum class bytecode {
     // declaration class types
     BOOL_CLASS = 21,
     INT_CLASS = 22,
+    STRING_CLASS = 23,
 
     // binary instructions
     ADD = 31,
