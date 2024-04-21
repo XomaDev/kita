@@ -16,7 +16,7 @@
 using namespace std;
 
 class stack_manager {
-    vector<array<uint64_t, 2>> main_stack;
+    vector<pair<stack_type, uint64_t>> main_stack;
     unordered_map<string, uint64_t> addr_map;
 
 public:
@@ -27,14 +27,14 @@ public:
 
     uint64_t assert_last_stack(stack_type expect_type);
 
-    array<uint64_t, 2> dereference(array<uint64_t, 2> &stack_element);
+    pair<stack_type, uint64_t> dereference(pair<stack_type, uint64_t> stack_element);
 
     void push_int(int64_t n);
     void push(stack_type type, uint64_t n);
 
     int64_t pop_int();
-    array<uint64_t, 2> pop_value();
-    array<uint64_t, 2> pop();
+    pair<stack_type, uint64_t> pop_value();
+    pair<stack_type, uint64_t> pop();
 };
 
 

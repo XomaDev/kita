@@ -150,17 +150,17 @@ void runtime::binary_operation() {
 
 bool runtime::binary_equals() {
     auto r = stack.pop_value(), l = stack.pop_value();
-    if (r[0] != l[0]) {
+    if (r.first != l.first) {
         // false if not same type
         return false;
     }
-    if (r[1] == l[1]) {
+    if (r.second == l.second) {
         // true if points to same value
         return true;
     }
-    if (static_cast<stack_type>(r[0]) == stack_type::STRING && static_cast<stack_type>(l[0]) == stack_type::STRING) {
-        auto left = reinterpret_cast<const char*>(l[1]);
-        auto right = reinterpret_cast<const char*>(r[1]);
+    if (r.first == stack_type::STRING && l.first == stack_type::STRING) {
+        auto left = reinterpret_cast<const char*>(l.second);
+        auto right = reinterpret_cast<const char*>(r.second);
 
         return strcmp(left, right) == 0;
     }
@@ -170,23 +170,21 @@ bool runtime::binary_equals() {
 void runtime::binary_addition() {
     // not just limited to Int + Int, includes String too
     auto right = stack.pop_value(), left = stack.pop_value();
-    auto right_type = static_cast<stack_type>(left[0]), left_type = static_cast<stack_type>(right[0]);
-    if (left_type == stack_type::INT && right_type == stack_type::INT) {
-        stack.push_int(static_cast<int>(left[1]) + static_cast<int>(right[1]));
+    if (left.first == stack_type::INT && right.first == stack_type::INT) {
+        stack.push_int(static_cast<int64_t>(left.second) + static_cast<int>(right.second));
         return;
     }
     auto concatenated = (new string(element_to_string(left) + element_to_string(right)))->c_str();
     stack.push(stack_type::STRING, reinterpret_cast<uint64_t>(concatenated));
 }
 
-string runtime::element_to_string(array<uint64_t, 2> element) {
-    auto type = static_cast<stack_type>(element[0]);
-    if (type == stack_type::STRING) {
-        return { reinterpret_cast<const char*>(element[1]) };
-    } else if (type == stack_type::BOOL || type == stack_type::INT) {
-        return to_string(element[1]);
+string runtime::element_to_string(pair<stack_type, uint64_t> element) {
+    if (element.first == stack_type::STRING) {
+        return { reinterpret_cast<const char*>(element.second) };
+    } else if (element.first == stack_type::BOOL || element.first == stack_type::INT) {
+        return to_string(element.second);
     }
-    throw runtime_error("Unknown left operand type " + to_string(element[0]));
+    throw runtime_error("Unknown left operand type " + to_string(static_cast<int>(element.first)));
 }
 
 void runtime::invoke() {
@@ -248,9 +246,9 @@ uchar runtime::advance() {
 void runtime::free_memory() {
     while (stack.stack_index) {
         auto popped = stack.pop();
-        if (static_cast<stack_type>(popped[0]) == stack_type::STRING) {
+        if (popped.first == stack_type::STRING) {
             // free dynamically allocated strings
-            const char* chars = reinterpret_cast<const char*>(popped[1]);
+            const char* chars = reinterpret_cast<const char*>(popped.second);
             delete[] chars;
         }
     }

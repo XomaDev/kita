@@ -40,7 +40,7 @@ class runtime {
     bool binary_equals();
     void binary_addition();
 
-    static string element_to_string(array<uint64_t, 2> element);
+    static string element_to_string(pair<stack_type, uint64_t> element);
 
     void invoke();
     void declare();

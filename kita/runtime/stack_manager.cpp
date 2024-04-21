@@ -27,20 +27,18 @@ uint64_t stack_manager::access_addr(const string& name) {
 
 uint64_t stack_manager::assert_last_stack(stack_type expect_type) {
     auto element = dereference(main_stack.back());
-    auto type = static_cast<stack_type>(element[0]);
-    if (type != expect_type) {
+    if (element.first != expect_type) {
         throw runtime_error("Expected " + to_string(static_cast<int>(expect_type)) +
-                            ", but got " + to_string(element[0]));
+                            ", but got " + to_string(static_cast<int>(element.first)));
     }
-    return element[1];
+    return element.second;
 }
 
-array<uint64_t, 2> stack_manager::dereference(array<uint64_t, 2> &stack_element) {
+pair<stack_type, uint64_t> stack_manager::dereference(pair<stack_type, uint64_t> stack_element) {
     for (;;) {
-        auto type = static_cast<stack_type>(static_cast<int>(stack_element[0]));
-        if (type == stack_type::PTR) {
+        if (stack_element.first == stack_type::PTR) {
             // points to another value on the stack_manager
-            stack_element = main_stack[stack_element[1]];
+            stack_element = main_stack[stack_element.second];
         } else {
             return stack_element;
         }
@@ -52,25 +50,23 @@ void stack_manager::push_int(int64_t n) {
 }
 
 void stack_manager::push(stack_type type, uint64_t n) {
-    main_stack.push_back({ static_cast<uint64_t>(type), n });
+    main_stack.emplace_back(type, n);
     stack_index++;
 }
 
 int64_t stack_manager::pop_int() {
     auto element = pop_value();
-    auto type = static_cast<stack_type>(element[0]);
-    if (type == stack_type::INT) {
-        return static_cast<int>(element[1]);
+    if (element.first == stack_type::INT) {
+        return static_cast<int64_t>(element.second);
     }
-    throw runtime_error("Expected stack_type:INT, got " + to_string(element[0]));
+    throw runtime_error("Expected stack_type:INT, got " + to_string(static_cast<int>(element.first)));
 }
 
-array<uint64_t, 2> stack_manager::pop_value() {
-    auto element = pop();
-    return dereference(element);
+pair<stack_type, uint64_t> stack_manager::pop_value() {
+    return dereference(pop());
 }
 
-array<uint64_t, 2> stack_manager::pop() {
+pair<stack_type, uint64_t> stack_manager::pop() {
     auto element = main_stack.back();
     main_stack.pop_back();
     stack_index--;
