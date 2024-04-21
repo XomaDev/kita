@@ -38,7 +38,7 @@ class runtime {
     void binary_operation();
     void binary_addition();
 
-    static const char *element_to_string(array<uint64_t, 2> element);
+    static string element_to_string(array<uint64_t, 2> element);
 
     void invoke();
     void declare();

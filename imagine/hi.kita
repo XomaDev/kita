@@ -1,2 +1,2 @@
-String~a: "hello world"
-disp a + " meow"
+Int~a: 8 + 2
+disp "The number is " + a

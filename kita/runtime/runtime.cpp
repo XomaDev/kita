@@ -108,24 +108,16 @@ void runtime::binary_addition() {
         stack.push_int(static_cast<int>(left[1]) + static_cast<int>(right[1]));
         return;
     }
-    const char* left_string = element_to_string(left);
-    const char* right_string = element_to_string(right);
-
-    auto left_len = strlen(left_string), right_len = strlen(right_string);
-    char* concatenated = new char[left_len + right_len + 1]; // +1 for nullptr
-
-    strcpy(concatenated, left_string);
-    strcat(concatenated, right_string);
-
+    auto concatenated = (new string(element_to_string(left) + element_to_string(right)))->c_str();
     stack.push(stack_type::STRING, reinterpret_cast<uint64_t>(concatenated));
 }
 
-const char* runtime::element_to_string(array<uint64_t, 2> element) {
+string runtime::element_to_string(array<uint64_t, 2> element) {
     auto type = static_cast<stack_type>(element[0]);
     if (type == stack_type::STRING) {
-        return reinterpret_cast<const char*>(element[1]);
+        return { reinterpret_cast<const char*>(element[1]) };
     } else if (type == stack_type::BOOL || type == stack_type::INT) {
-        return to_string(static_cast<int>(element[1])).c_str();
+        return to_string(element[1]);
     }
     throw runtime_error("Unknown left operand type " + to_string(element[0]));
 }
