@@ -41,8 +41,10 @@ class runtime {
     static const char *element_to_string(array<uint64_t, 2> element);
 
     void invoke();
-
     void declare();
+
+    void free_memory();
+
 public:
     runtime(unique_ptr<uchar[]> bytes, long length) : bytes(std::move(bytes)), length(length) {
         // constructor initialized

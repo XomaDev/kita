@@ -13,6 +13,7 @@ void runtime::run() {
     while (!isEOF()) {
         exec_next();
     }
+    free_memory();
 }
 
 void runtime::exec_next() {
@@ -183,4 +184,15 @@ string runtime::read_string() {
 
 uchar runtime::advance() {
     return bytes[index++];
+}
+
+void runtime::free_memory() {
+    while (stack.stack_index) {
+        auto popped = stack.pop();
+        if (static_cast<stack_type>(popped[0]) == stack_type::STRING) {
+            // free dynamically allocated strings
+            const char* chars = reinterpret_cast<const char*>(popped[1]);
+            delete[] chars;
+        }
+    }
 }
