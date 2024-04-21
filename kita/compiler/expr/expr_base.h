@@ -37,7 +37,7 @@ public:
 
     virtual bool is_leaf() {
         // if there are no further member evaluations
-        // my concept of stack optimization
+        // my concept of stack_manager optimization
 
         // [load 1, load 2, load 7, *, + ]
         // better: [load 7, load 2, *, load 1, + ]
