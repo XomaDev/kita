@@ -36,6 +36,8 @@ class runtime {
     void load();
 
     void binary_operation();
+
+    bool binary_equals();
     void binary_addition();
 
     static string element_to_string(array<uint64_t, 2> element);

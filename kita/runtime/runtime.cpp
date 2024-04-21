@@ -94,10 +94,77 @@ void runtime::binary_operation() {
             stack.push_int(l / r);
             break;
         }
+        case bytecode::BITWISE_AND: {
+            auto r = stack.pop_int(), l = stack.pop_int();
+            stack.push_int(l & r);
+            break;
+        }
+        case bytecode::BITWISE_OR: {
+            auto r = stack.pop_int(), l = stack.pop_int();
+            stack.push_int(l | r);
+            break;
+        }
+        case bytecode::LOGICAL_AND: {
+            auto r = stack.pop_int(), l = stack.pop_int();
+            stack.push_int(l && r);
+            break;
+        }
+        case bytecode::LOGICAL_OR: {
+            auto r = stack.pop_int(), l = stack.pop_int();
+            stack.push_int(l || r);
+            break;
+        }
+        case bytecode::EQUALS: {
+            stack.push(stack_type::BOOL, binary_equals());
+            break;
+        }
+        case bytecode::NOT_EQUALS: {
+            stack.push(stack_type::BOOL, !binary_equals());
+            break;
+        }
+        case bytecode::GREATER_THAN: {
+            auto r = stack.pop_int(), l = stack.pop_int();
+            stack.push(stack_type::BOOL, l > r);
+            break;
+        }
+        case bytecode::LESSER_THAN: {
+            auto r = stack.pop_int(), l = stack.pop_int();
+            stack.push(stack_type::BOOL, l < r);
+            break;
+        }
+        case bytecode::GREATER_EQUALS: {
+            auto r = stack.pop_int(), l = stack.pop_int();
+            stack.push(stack_type::BOOL, l >= r);
+            break;
+        }
+        case bytecode::LESSER_EQUALS: {
+            auto r = stack.pop_int(), l = stack.pop_int();
+            stack.push(stack_type::BOOL, l <= r);
+            break;
+        }
         default: {
             throw runtime_error("Unknown binary operator " + to_string(binary_op));
         }
     }
+}
+
+bool runtime::binary_equals() {
+    auto r = stack.pop_value(), l = stack.pop_value();
+    if (r[0] != l[0]) {
+        // false if not same type
+        return false;
+    }
+    if (r[1] == l[1]) {
+        // true if points to same value
+        return true;
+    }
+    if (static_cast<stack_type>(r[0]) == stack_type::STRING && static_cast<stack_type>(l[0]) == stack_type::STRING) {
+        auto left = reinterpret_cast<const char*>(l[1]);
+        auto right = reinterpret_cast<const char*>(r[1]);
+
+        return strcmp(left, right) == 0;
+    }
+    return false;
 }
 
 void runtime::binary_addition() {
