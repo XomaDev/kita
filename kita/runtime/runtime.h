@@ -53,7 +53,6 @@ class runtime {
     void evaluate_scope();
     void skip_scope();
 
-
     void free_memory();
 
 public:

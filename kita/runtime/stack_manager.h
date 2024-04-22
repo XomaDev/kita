@@ -17,10 +17,12 @@ using namespace std;
 
 class stack_manager {
     vector<pair<stack_type, uint64_t>> main_stack;
+
     unordered_map<string, uint64_t> addr_map;
+    unordered_map<uint64_t, string> rev_addr_map;
 
 public:
-    uint64_t stack_index = 0;
+    uint64_t stack_length = 0;
 
     void move_addr(const string &name, bool overwrite);
     uint64_t access_addr(const string &name);
@@ -35,6 +37,8 @@ public:
     int64_t pop_int();
     pair<stack_type, uint64_t> pop_value();
     pair<stack_type, uint64_t> pop();
+
+    void free_stack(uint64_t last_n);
 };
 
 

@@ -243,19 +243,26 @@ void runtime::if_decl() {
         if (has_else_branch) skip_scope(); // skip else *body*
     } else {
         skip_scope(); // skip *body*
-        evaluate_scope(); // evaluate else *body*
+        if (has_else_branch) evaluate_scope(); // evaluate else *body*;
     }
 }
 
 void runtime::evaluate_scope() {
     expect(bytecode::SCOPE_START);
-
+    auto stack_len_before = stack.stack_length;
     for (;;) {
         exec_next();
         if (static_cast<bytecode>(peek()) == bytecode::SCOPE_END) {
             index++;
             break;
         }
+    }
+    auto stack_len_after = stack.stack_length;
+    if (stack_len_before != stack_len_after) {
+        // stack_len_after > stack_len_before
+
+        // time to free up this stack
+        stack.free_stack(stack_len_after - stack_len_before);
     }
 }
 
@@ -305,12 +312,6 @@ uchar runtime::peek() {
 }
 
 void runtime::free_memory() {
-    while (stack.stack_index) {
-        auto popped = stack.pop();
-        if (popped.first == stack_type::STRING) {
-            // free dynamically allocated strings
-            const char* chars = reinterpret_cast<const char*>(popped.second);
-            delete[] chars;
-        }
-    }
+    // free all memory in stack
+    stack.free_stack(stack.stack_length);
 }

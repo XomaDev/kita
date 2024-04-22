@@ -11,7 +11,8 @@ using namespace std;
 void stack_manager::move_addr(const string& name, bool overwrite) {
     auto find = addr_map.find(name);
     if (overwrite || find == addr_map.end()) {
-        addr_map[name] = stack_index - 1;
+        addr_map[name] = stack_length - 1;
+        rev_addr_map[stack_length - 1] = name;
     } else {
         throw runtime_error("Addr already exists '" + name + "'");
     }
@@ -51,7 +52,7 @@ void stack_manager::push_int(int64_t n) {
 
 void stack_manager::push(stack_type type, uint64_t n) {
     main_stack.emplace_back(type, n);
-    stack_index++;
+    stack_length++;
 }
 
 int64_t stack_manager::pop_int() {
@@ -69,6 +70,27 @@ pair<stack_type, uint64_t> stack_manager::pop_value() {
 pair<stack_type, uint64_t> stack_manager::pop() {
     auto element = main_stack.back();
     main_stack.pop_back();
-    stack_index--;
+    stack_length--;
     return element;
+}
+
+void stack_manager::free_stack(uint64_t last_n) {
+    while (last_n != 0) {
+        auto popped = pop();
+
+        // find references pointing to this stack
+        auto find = rev_addr_map.find(stack_length);
+        if (find != rev_addr_map.end()) {
+            auto addr_name = find->second;
+            addr_map.erase(addr_name);
+            rev_addr_map.erase(popped.second);
+        }
+
+        if (popped.first == stack_type::STRING) {
+            // free dynamically allocated strings
+            const char* chars = reinterpret_cast<const char*>(popped.second);
+            delete[] chars;
+        }
+        last_n--;
+    }
 }

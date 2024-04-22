@@ -1,8 +1,7 @@
-Int~a: 8 + 2 + 1
+Int~a: 8 + 2
 if ( a == 10 && a + 1 > a )  {
-    disp "Meowww"
-} else if ( a == 12 ) {
-    disp "else if branch!"
-} else if ( a == 11 ) {
-    disp "Third else if branch!"
+    Int~b: a * 10
+    disp "Value of B: " + b
 }
+
+disp a * 2
