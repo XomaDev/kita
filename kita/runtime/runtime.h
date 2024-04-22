@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include "stack_type.h"
 #include "stack_manager.h"
-#include "../compiler/bytecode.h"
+#include "../bytecode.h"
 
 using namespace std;
 

@@ -1,7 +1,2 @@
-Int~a: 8 + 2
-if ( a == 10 && a + 1 > a )  {
-    Int~b: a * 10
-    disp "Value of B: " + b
-}
-
-disp a * 2
+disp "hello world"
+hewwo()

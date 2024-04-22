@@ -23,6 +23,7 @@ public:
         set_display(
                 "if{conditions=" + this->logical_exprs->to_string() +
                 ", if=" + this->if_body->to_string() + (this->else_body == nullptr ? "" : ", else=" + this->else_body->to_string())
+                + "}"
                 );
     }
 

@@ -6,7 +6,6 @@
 #include <iostream>
 #include <cstring>
 #include "runtime.h"
-#include "../compiler/bytecode.h"
 #include "stack_type.h"
 
 void runtime::run() {

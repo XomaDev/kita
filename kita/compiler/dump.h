@@ -10,7 +10,7 @@
 #include <utility>
 #include <vector>
 #include <fstream>
-#include "bytecode.h"
+#include "../bytecode.h"
 #include "expr/expr_base.h"
 
 using namespace std;

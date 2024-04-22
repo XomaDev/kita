@@ -117,12 +117,15 @@ unique_ptr<expr_invoke> parser::invoke_decl(unique_ptr<token>& method_token) {
 }
 
 unique_ptr<expr_group> parser::read_invoke_args(const string& type_delimiter) {
-    unique_ptr<expr_group> args;
+    unique_ptr<expr_group> args = nullptr;
     auto &peek_token = peek();
 
     if (peek_token->has_type("OpenExpr")) {
         skip(); // eat '('
-        args = multi_expr_read(type_delimiter);
+        // some func calls are without parameters
+        if (peek()->first_type != "CloseExpr") {
+            args = multi_expr_read(type_delimiter);
+        }
         strict_match("CloseExpr");
     } else if (peek_token->has_type("StartBody")) {
         throw runtime_error("Expected '(' and not '{'");
@@ -205,7 +208,12 @@ int parser::operator_precedence(unique_ptr<token> &token_operator) {
 
 unique_ptr<expr_base> parser::read_expr() {
     auto &token = next();
-    if (token->has_type("Value")) {
+    if (token->has_type("Identifier")) {
+        if (!isEOF() && peek()->first_type == "OpenExpr") {
+            return invoke_decl(token);
+        }
+        return make_unique<expr_token>(std::move(token));
+    } else if (token->has_type("Value")) {
         return make_unique<expr_token>(std::move(token));
     } else if (token->has_type("OpenExpr")) {
         auto expr = parse_next();

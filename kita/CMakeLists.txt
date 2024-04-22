@@ -19,7 +19,7 @@ add_executable(kita main.cpp
         compiler/expr/expr_func.h
         compiler/expr/expr_group.h
         compiler/expr/expr_inlineif.h
-        compiler/bytecode.h
+        bytecode.h
         compiler/dump.cpp
         compiler/dump.h
         compiler/dump.cpp
