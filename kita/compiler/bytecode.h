@@ -11,12 +11,15 @@ enum class bytecode {
     INT_TYPE = 1,
     NAME_TYPE = 2,
     STRING_TYPE = 3,
+    SCOPE_START = 4,
+    SCOPE_END = 5,
 
     // instruction types
     LOAD = 11,
     BINARY_OP = 12,
     INVOKE = 13,
     DECLARE = 14,
+    IF = 15,
 
     // declaration class types
     BOOL_CLASS = 21,

@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include "stack_type.h"
 #include "stack_manager.h"
+#include "../compiler/bytecode.h"
 
 using namespace std;
 
@@ -28,6 +29,9 @@ class runtime {
 
     string read_string();
 
+    void expect(bytecode code);
+
+    uchar peek();
     uchar advance();
 
     [[nodiscard]] bool isEOF() const;
@@ -45,6 +49,11 @@ class runtime {
     void invoke();
     void declare();
 
+    void if_decl();
+    void evaluate_scope();
+    void skip_scope();
+
+
     void free_memory();
 
 public:
@@ -53,6 +62,7 @@ public:
     }
 
     void run();
+
 };
 
 

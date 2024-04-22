@@ -22,8 +22,32 @@ public:
                             : logical_exprs(std::move(logical_exprs)), if_body(std::move(if_body)), else_body(std::move(else_body)) {
         set_display(
                 "if{conditions=" + this->logical_exprs->to_string() +
-                ", if=" + this->if_body->to_string() + ", else=" + this->else_body->to_string()
+                ", if=" + this->if_body->to_string() + (this->else_body == nullptr ? "" : ", else=" + this->else_body->to_string())
                 );
+    }
+
+    void dump(class dump *pDump) override {
+        logical_exprs->dump(pDump);
+
+        pDump->write(bytecode::IF);
+        // if it has else branch
+        pDump->write_uint8(else_body == nullptr ? 0 : 1);
+
+        // if true *body* branch
+        pDump->write(bytecode::SCOPE_START);
+        if_body->dump(pDump);
+        pDump->write(bytecode::SCOPE_END);
+
+        if (else_body != nullptr) {
+            // else *body* branch
+            pDump->write(bytecode::SCOPE_START);
+            else_body->dump(pDump);
+            pDump->write(bytecode::SCOPE_END);
+        }
+    }
+
+    bool is_leaf() override {
+        return false;
     }
 };
 

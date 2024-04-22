@@ -1,0 +1,48 @@
+BLOCK_ID BLOCK_LENGTH BLOCK
+
+IF_BLOCK
+MAIN_BLOCK   # alwyas at the end
+
+===================================
+
+RECURSIVE BLOCK PARSING ALGORITHM
+
+fn hewwo: Int~a {
+    if ( a == 8 ) {
+        disp a * 2
+    }
+}
+
+hewwo(8)
+
+=============WORKING OF RECURSIVE BLOCK PARSING ALGORITHM==============
+#### FIRST STAGE
+
+IF_BLOCK: disp * 2
+
+fn hewwo: Int~a {
+    if ( a == 8 ) IF_BLOCK
+}
+
+hewwo(8)
+
+#### SECOND STAGE
+
+IF_BLOCK: disp * 2
+FUN_HEWWO_BLOCK: if ( a == 8 ) IF_BLOCK
+
+fn hewwo: Int~a: FUN_HEWWO_BLOCK
+
+hewwo(8)
+
+========= OTHER IMAGINATION ===============
+
+fn hewwo: Int~a: {
+    if ( a == 0 ) {
+        return a + hewwo(1)
+    } else {
+        return 2
+    }
+}
+
+disp hewwo(0)

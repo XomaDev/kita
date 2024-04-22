@@ -56,7 +56,7 @@ void stack_manager::push(stack_type type, uint64_t n) {
 
 int64_t stack_manager::pop_int() {
     auto element = pop_value();
-    if (element.first == stack_type::INT) {
+    if (element.first == stack_type::BOOL || element.first == stack_type::INT) {
         return static_cast<int64_t>(element.second);
     }
     throw runtime_error("Expected stack_type:INT, got " + to_string(static_cast<int>(element.first)));

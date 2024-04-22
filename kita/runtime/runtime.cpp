@@ -31,6 +31,9 @@ void runtime::exec_next() {
         case bytecode::DECLARE:
             declare();
             break;
+        case bytecode::IF:
+            if_decl();
+            break;
         default: {
             throw runtime_error("Unknown bytecode " + to_string(byte_code));
         }
@@ -106,12 +109,12 @@ void runtime::binary_operation() {
         }
         case bytecode::LOGICAL_AND: {
             auto r = stack.pop_int(), l = stack.pop_int();
-            stack.push_int(l && r);
+            stack.push(stack_type::BOOL, l && r);
             break;
         }
         case bytecode::LOGICAL_OR: {
             auto r = stack.pop_int(), l = stack.pop_int();
-            stack.push_int(l || r);
+            stack.push(stack_type::BOOL, l || r);
             break;
         }
         case bytecode::EQUALS: {
@@ -228,6 +231,52 @@ void runtime::declare() {
     stack.move_addr(name, false);
 }
 
+void runtime::if_decl() {
+    auto eq_value = stack.pop_value();
+    if (eq_value.first != stack_type::BOOL) {
+        throw runtime_error("If (*non-bool*expr) found");
+    }
+    bool has_else_branch = advance() == 1;
+
+    if (eq_value.second == 1) {
+        evaluate_scope(); // evaluate *body*
+        if (has_else_branch) skip_scope(); // skip else *body*
+    } else {
+        skip_scope(); // skip *body*
+        evaluate_scope(); // evaluate else *body*
+    }
+}
+
+void runtime::evaluate_scope() {
+    expect(bytecode::SCOPE_START);
+
+    for (;;) {
+        exec_next();
+        if (static_cast<bytecode>(peek()) == bytecode::SCOPE_END) {
+            index++;
+            break;
+        }
+    }
+}
+
+void runtime::skip_scope() {
+    expect(bytecode::SCOPE_START);
+
+    uint num_inner_scopes = 0;
+    for (;;) {
+        auto next_bytecode = static_cast<bytecode>(advance());
+        if (next_bytecode == bytecode::SCOPE_END) {
+            if (num_inner_scopes == 0) {
+                break;
+            } else {
+                num_inner_scopes--;
+            }
+        } else if (next_bytecode == bytecode::SCOPE_START) {
+            num_inner_scopes++;
+        }
+    }
+}
+
 bool runtime::isEOF() const {
     return index == length;
 }
@@ -239,8 +288,20 @@ string runtime::read_string() {
     return name;
 }
 
+void runtime::expect(bytecode code) {
+    auto next_bytecode = advance();
+    auto expected = static_cast<uchar>(code);
+    if (next_bytecode != expected) {
+        throw runtime_error("Expected " + to_string(expected) + ", but got " + to_string(next_bytecode));
+    }
+}
+
 uchar runtime::advance() {
     return bytes[index++];
+}
+
+uchar runtime::peek() {
+    return bytes[index];
 }
 
 void runtime::free_memory() {

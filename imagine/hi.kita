@@ -1,3 +1,8 @@
-Int~a: 8 + 2
-disp "The number is " + a
-disp a + 1 > 10
+Int~a: 8 + 2 + 1
+if ( a == 10 && a + 1 > a )  {
+    disp "Meowww"
+} else if ( a == 12 ) {
+    disp "else if branch!"
+} else if ( a == 11 ) {
+    disp "Third else if branch!"
+}
