@@ -28,6 +28,7 @@ class runtime {
     stack_manager stack;
 
     string read_string();
+    int read_int32();
 
     void expect(bytecode code);
 
@@ -55,7 +56,7 @@ class runtime {
     void fun_decl();
 
     void evaluate_scope();
-    void skip_scope();
+    void pass_scope();
 
     void free_memory();
 

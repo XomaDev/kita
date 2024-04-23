@@ -34,15 +34,27 @@ public:
         // if it has else branch
         pDump->write_uint8(else_body == nullptr ? 0 : 1);
 
+        class dump mem_dump;
+        if_body->dump(&mem_dump);
+
         // if true *body* branch
+        pDump->write_int(mem_dump.size());
+        cout << "Size: " << std::to_string(mem_dump.size()) << endl;
+
         pDump->write(bytecode::SCOPE_START);
-        if_body->dump(pDump);
+
+        mem_dump.transfer(pDump);
         pDump->write(bytecode::SCOPE_END);
 
         if (else_body != nullptr) {
+            class dump re_mem_dump;
+            cout << "Size: " << re_mem_dump.size() << endl;
+            else_body->dump(&re_mem_dump);
+
             // else *body* branch
+            pDump->write_int(re_mem_dump.size());
             pDump->write(bytecode::SCOPE_START);
-            else_body->dump(pDump);
+            re_mem_dump.transfer(pDump);
             pDump->write(bytecode::SCOPE_END);
         }
     }

@@ -52,10 +52,7 @@ void runtime::load() {
             break;
         }
         case bytecode::INT_TYPE: {
-            int value = advance() & 255 |
-                        (advance() & 255) << 8 |
-                        (advance() & 255) << 16 |
-                        (advance() & 255) << 24;
+            int value = read_int32();
             stack.push_int(value);
             break;
         }
@@ -259,9 +256,9 @@ void runtime::if_decl() {
 
     if (eq_value.second == 1) {
         evaluate_scope(); // evaluate *body*
-        if (has_else_branch) skip_scope(); // skip else *body*
+        if (has_else_branch) pass_scope(); // skip else *body*
     } else {
-        skip_scope(); // skip *body*
+        pass_scope(); // skip *body*
         if (has_else_branch) evaluate_scope(); // evaluate else *body*;
     }
 }
@@ -282,13 +279,14 @@ void runtime::fun_decl() {
         args_count--;
     }
     auto func_decl = new func(index, func_name, parameter_names, parameter_types);
+    pass_scope();
 
     stack.push(stack_type::FUNC_PTR, reinterpret_cast<uint64_t>(func_decl));
     stack.move_addr("func@" + func_name, false);
-    skip_scope(); // skip function body
 }
 
 void runtime::evaluate_scope() {
+    index += 4;
     expect(bytecode::SCOPE_START);
     auto stack_len_before = stack.stack_length;
     stack.stack_depth++;
@@ -309,22 +307,11 @@ void runtime::evaluate_scope() {
     }
 }
 
-void runtime::skip_scope() {
+void runtime::pass_scope() {
+    int scope_size = read_int32();
     expect(bytecode::SCOPE_START);
-
-    uint num_inner_scopes = 0;
-    for (;;) {
-        auto next_bytecode = static_cast<bytecode>(advance());
-        if (next_bytecode == bytecode::SCOPE_END) {
-            if (num_inner_scopes == 0) {
-                break;
-            } else {
-                num_inner_scopes--;
-            }
-        } else if (next_bytecode == bytecode::SCOPE_START) {
-            num_inner_scopes++;
-        }
-    }
+    index += scope_size;
+    expect(bytecode::SCOPE_END);
 }
 
 bool runtime::isEOF() const {
@@ -336,6 +323,13 @@ string runtime::read_string() {
     string name(reinterpret_cast<const char *>(&bytes[index]), name_length);
     index += name_length;
     return name;
+}
+
+int runtime::read_int32() {
+    return advance() & 255 |
+           (advance() & 255) << 8 |
+           (advance() & 255) << 16 |
+           (advance() & 255) << 24;;
 }
 
 void runtime::expect(bytecode code) {

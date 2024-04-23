@@ -20,17 +20,19 @@ class expr_base;
 class dump {
     vector<unique_ptr<expr_base>> exprs;
 
-    ofstream file;
+    ostream* file;
 public:
-    explicit dump(const string& file_path, vector<unique_ptr<expr_base>> exprs);
+    dump();
+    dump(const string& file_path, vector<unique_ptr<expr_base>> exprs);
 
     void write(bytecode b);
-
     void write_int(int n);
-
     void write_name(string name);
-
     void write_uint8(uint8_t b);
+
+    // used when this->file is ostringstream
+    int size();
+    void transfer(dump *another);
 };
 
 

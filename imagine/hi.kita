@@ -1,8 +1,8 @@
-fn hewwao: Int~a {
+fn hewwo: Int~a {
     if ( a == 8 ) {
-        hewwao(2)
+        hewwo(2)
     } else {
-        disp "hello world " + a
+        disp "hello world YAY " + a
     }
 }
-hewwao(8)
+hewwo(8)
