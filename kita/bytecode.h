@@ -20,6 +20,7 @@ enum class bytecode {
     INVOKE = 13,
     DECLARE = 14,
     IF = 15,
+    FUNC = 16,
 
     // declaration class types
     BOOL_CLASS = 21,

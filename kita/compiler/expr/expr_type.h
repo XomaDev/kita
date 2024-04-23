@@ -23,8 +23,11 @@ public:
     }
 
     void dump(class dump *pDump) override {
-        expr->dump(pDump);
-        pDump->write(bytecode::DECLARE);
+        if (expr != nullptr) {
+            // sometimes, it could be uninit, or func parameter decl
+            expr->dump(pDump);
+            pDump->write(bytecode::DECLARE);
+        }
         if (class_name == "Int") {
             pDump->write(bytecode::INT_CLASS);
         } else if (class_name == "Bool") {

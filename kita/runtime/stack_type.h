@@ -11,6 +11,7 @@ enum class stack_type {
     STRING = 2,
 
     PTR = 20,
+    FUNC_PTR = 21,
 };
 
 #endif //KITA_STACK_TYPE_H

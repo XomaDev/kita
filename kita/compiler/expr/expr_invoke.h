@@ -35,6 +35,7 @@ public:
             pDump->write(bytecode::DISP);
         } else {
             // write the method name this time ahh
+            pDump->write(bytecode::NAME_TYPE);
             pDump->write_name(method_name);
         }
     }

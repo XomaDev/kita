@@ -7,6 +7,7 @@
 #include <cstring>
 #include "runtime.h"
 #include "stack_type.h"
+#include "func.h"
 
 void runtime::run() {
     while (!isEOF()) {
@@ -33,6 +34,9 @@ void runtime::exec_next() {
         case bytecode::IF:
             if_decl();
             break;
+        case bytecode::FUNC:
+            fun_decl();
+            break;
         default: {
             throw runtime_error("Unknown bytecode " + to_string(byte_code));
         }
@@ -57,7 +61,7 @@ void runtime::load() {
         }
         case bytecode::NAME_TYPE: {
             string name = read_string();
-            stack.push(stack_type::PTR, stack.access_addr(name));
+            stack.push(stack_type::PTR, stack.access_addr("var@" + name));
             break;
         }
         case bytecode::STRING_TYPE: {
@@ -200,10 +204,26 @@ void runtime::invoke() {
             }
             break;
         }
+        case bytecode::NAME_TYPE: {
+            // custom func invocation
+            func_invoke(num_args);
+            break;
+        }
         default: {
             throw runtime_error("Unknown method code " + to_string(method));
         }
     }
+}
+
+void runtime::func_invoke(int num_args) {
+    auto func = stack.access_func("func@" + read_string());
+    func->verify_signature(num_args, stack);
+
+    long curr_cursor = index;
+    index = func->index;
+    evaluate_scope();
+    stack.free_stack(func->parameters.size());
+    index = curr_cursor;
 }
 
 void runtime::declare() {
@@ -227,7 +247,7 @@ void runtime::declare() {
             throw runtime_error("Unknown class type " + to_string(class_type));
         }
     }
-    stack.move_addr(name, false);
+    stack.move_addr("var@" + name, false);
 }
 
 void runtime::if_decl() {
@@ -246,9 +266,32 @@ void runtime::if_decl() {
     }
 }
 
+void runtime::fun_decl() {
+    auto func_name = read_string();
+    uint8_t args_count = advance();
+
+    vector<string> parameter_names;
+    vector<bytecode> parameter_types;
+
+    while (args_count) {
+        int class_type = advance();
+        string name = read_string();
+
+        parameter_names.emplace_back(name);
+        parameter_types.emplace_back(static_cast<bytecode>(class_type));
+        args_count--;
+    }
+    auto func_decl = new func(index, func_name, parameter_names, parameter_types);
+
+    stack.push(stack_type::FUNC_PTR, reinterpret_cast<uint64_t>(func_decl));
+    stack.move_addr("func@" + func_name, false);
+    skip_scope(); // skip function body
+}
+
 void runtime::evaluate_scope() {
     expect(bytecode::SCOPE_START);
     auto stack_len_before = stack.stack_length;
+    stack.stack_depth++;
     for (;;) {
         exec_next();
         if (static_cast<bytecode>(peek()) == bytecode::SCOPE_END) {
@@ -256,6 +299,7 @@ void runtime::evaluate_scope() {
             break;
         }
     }
+    stack.stack_depth--;
     auto stack_len_after = stack.stack_length;
     if (stack_len_before != stack_len_after) {
         // stack_len_after > stack_len_before

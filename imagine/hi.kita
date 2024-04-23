@@ -1,2 +1,8 @@
-disp "hello world"
-hewwo()
+fn hewwao: Int~a {
+    if ( a == 8 ) {
+        hewwao(2)
+    } else {
+        disp "hello world " + a
+    }
+}
+hewwao(8)

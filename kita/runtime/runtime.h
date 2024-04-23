@@ -11,8 +11,8 @@
 #include <id3/globals.h>
 #include <unordered_map>
 #include "stack_type.h"
-#include "stack_manager.h"
 #include "../bytecode.h"
+#include "stack_manager.h"
 
 using namespace std;
 
@@ -47,9 +47,13 @@ class runtime {
     static string element_to_string(pair<stack_type, uint64_t> element);
 
     void invoke();
+    void func_invoke(int num_args);
+
     void declare();
 
     void if_decl();
+    void fun_decl();
+
     void evaluate_scope();
     void skip_scope();
 
@@ -61,7 +65,6 @@ public:
     }
 
     void run();
-
 };
 
 

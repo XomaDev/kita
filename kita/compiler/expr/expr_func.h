@@ -29,6 +29,25 @@ public:
                  + ", args=" + this->type_args->to_string() + ", body=" + this->func_body->to_string() + "}"
         );
     }
+
+    void dump(class dump *pDump) override {
+        pDump->write(bytecode::FUNC);
+        // dump func name
+        pDump->write_name(func_name);
+
+        pDump->write_uint8(type_args->args_size);
+        // dump parameter types
+        type_args->dump(pDump);
+
+        // dump func body
+        pDump->write(bytecode::SCOPE_START);
+        func_body->dump(pDump);
+        pDump->write(bytecode::SCOPE_END);
+    }
+
+    bool is_leaf() override {
+        return false;
+    }
 };
 
 

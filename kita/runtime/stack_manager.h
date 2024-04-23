@@ -12,6 +12,7 @@
 #include <string>
 #include <cstdint>
 #include "stack_type.h"
+#include "func.h"
 
 using namespace std;
 
@@ -24,8 +25,13 @@ class stack_manager {
 public:
     uint64_t stack_length = 0;
 
+    uint64_t stack_depth = 0;
+
     void move_addr(const string &name, bool overwrite);
+    void move_addr_depth(uint64_t depth, const string &name, bool overwrite);
     uint64_t access_addr(const string &name);
+
+    class func * access_func(const string &name);
 
     uint64_t assert_last_stack(stack_type expect_type);
 
