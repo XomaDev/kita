@@ -12,6 +12,8 @@
 #include "expr/expr_func.h"
 #include "expr/expr_if.h"
 #include "expr/expr_inlineif.h"
+#include "expr/expr_return.h"
+#include "expr/expr_class.h"
 
 using namespace std;
 
@@ -33,6 +35,8 @@ unique_ptr<expr_base> parser::parse_next() {
             return invoke_decl(token);
         } else if (token->has_type("Function")) {
             return function_decl();
+        } else if (token->first_type == "Return") {
+            return make_unique<expr_return>(std::move(parse_next()));
         }
     }
     back();
@@ -49,6 +53,7 @@ unique_ptr<expr_base> parser::if_decl(unique_ptr<token>& if_token) {
 
     if (next_match("StartBody")) {
         unique_ptr<expr_group> if_expr = read_body();
+        cout << "Body is " << if_expr->to_string() << endl;
         unique_ptr<expr_group> else_expr = nullptr;
 
         if (!isEOF() && next_match("Else")) {
@@ -73,6 +78,7 @@ unique_ptr<expr_base> parser::if_decl(unique_ptr<token>& if_token) {
 }
 
 unique_ptr<expr_func> parser::function_decl() {
+    auto ret_class = make_unique<expr_class>(peek()->first_type == "Class" ? std::move(next()) : nullptr);
     string function_name = strict_match("Identifier")->value;
 
     vector<unique_ptr<expr_base>> type_args;
@@ -90,6 +96,7 @@ unique_ptr<expr_func> parser::function_decl() {
     bool inline_expr = false;
     unique_ptr<expr_group> func_body;
     if (next_match("Assignment")) {
+        throw runtime_error("Inline not yet supported");
         // inline return expression assignment
         skip();
         func_body = expr_group::singleton(parse_next());
@@ -97,7 +104,7 @@ unique_ptr<expr_func> parser::function_decl() {
     } else {
         func_body = read_body();
     }
-    return make_unique<expr_func>(function_name, inline_expr, std::move(func_body), std::move(type_args_group));
+    return make_unique<expr_func>(function_name, std::move(ret_class), std::move(func_body), std::move(type_args_group));
 }
 
 unique_ptr<expr_group> parser::read_body() {

@@ -1,8 +1,7 @@
-fn hewwo: Int~a {
-    if ( a == 8 ) {
-        hewwo(2)
-    } else {
-        disp "hello world YAY " + a
+fn Int fib: Int~n {
+    if (n < 2) {
+        return n
     }
+    return fib(n - 1) + fib(n - 2)
 }
-hewwo(8)
+disp "Fib: " + fib(27)

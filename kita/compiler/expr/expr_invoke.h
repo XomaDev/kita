@@ -33,6 +33,8 @@ public:
 
         if (method_name == "disp") {
             pDump->write(bytecode::DISP);
+        } else if (method_name == "scope") {
+            pDump->write(bytecode::SCOPE);
         } else {
             // write the method name this time ahh
             pDump->write(bytecode::NAME_TYPE);

@@ -7,12 +7,13 @@
 
 enum class bytecode {
     // value types
-    BOOL_TYPE = 0,
-    INT_TYPE = 1,
-    NAME_TYPE = 2,
-    STRING_TYPE = 3,
-    SCOPE_START = 4,
-    SCOPE_END = 5,
+    VOID = 0,
+    BOOL_TYPE = 1,
+    INT_TYPE = 2,
+    NAME_TYPE = 3,
+    STRING_TYPE = 4,
+    SCOPE_START = 5,
+    SCOPE_END = 6,
 
     // instruction types
     LOAD = 11,
@@ -21,6 +22,7 @@ enum class bytecode {
     DECLARE = 14,
     IF = 15,
     FUNC = 16,
+    RETURN = 17,
 
     // declaration class types
     BOOL_CLASS = 21,
@@ -46,6 +48,7 @@ enum class bytecode {
 
 
     DISP = 50,
+    SCOPE = 51,
 };
 
 #endif //KITA_BYTECODE_H

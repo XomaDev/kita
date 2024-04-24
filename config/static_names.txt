@@ -1,8 +1,9 @@
 true Boolean:True:Value
 false Boolean:False:Value
-Int Class
-Bool Class
-String Class
+Void Class:Void:Value
+Int Class:Int
+Bool Class:Bool
+String Class:String
 disp Display:Method
 if If:IfConditional
 ifall IfAll:IfConditional

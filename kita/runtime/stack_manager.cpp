@@ -5,15 +5,14 @@
 #include <iostream>
 #include "stack_manager.h"
 #include "stack_type.h"
-#include "func.h"
 
 using namespace std;
 
 void stack_manager::move_addr(const string &name, bool overwrite) {
-    move_addr_depth(stack_depth, name, overwrite);
+    move_addr(stack_depth, name, overwrite);
 }
 
-void stack_manager::move_addr_depth(uint64_t depth, const string &name, bool overwrite) {
+void stack_manager::move_addr(uint64_t depth, const string &name, bool overwrite) {
     auto store_name = to_string(depth) + "@" + name;
     auto find = addr_map.find(store_name);
     if (overwrite || find == addr_map.end()) {
@@ -25,25 +24,25 @@ void stack_manager::move_addr_depth(uint64_t depth, const string &name, bool ove
 }
 
 uint64_t stack_manager::access_addr(const string& name) {
-    auto search_depth = stack_length;
+    auto search_depth = stack_depth;
     for (;;) {
         auto store_name = to_string(search_depth) + "@" + name;
         auto find = addr_map.find(store_name);
         if (find != addr_map.end()) {
             return find->second;
         } else if (search_depth == 0) {
-            throw runtime_error("Cannot access address '" + name);
+            throw runtime_error("Cannot access address '" + store_name + "'");
         }
         search_depth--;
     }
 }
 
-class func* stack_manager::access_func(const string& name) {
-    auto fun_stack = main_stack[access_addr(name)];
-    if (fun_stack.first == stack_type::FUNC_PTR) {
-        return reinterpret_cast<class func*>(fun_stack.second);
+func_obj* stack_manager::lookup_func(const string &name) {
+    auto pointer = main_stack[access_addr(name)];
+    if (pointer.first == stack_type::FUNC_PTR) {
+        return reinterpret_cast<func_obj *>(pointer.second);
     }
-    throw runtime_error("Expected stack_type::FUNC_PTR, got " + to_string(static_cast<int>(fun_stack.first)));
+    throw runtime_error("Expected FUNC_PTR, got " + to_string(static_cast<int>(pointer.first)));
 }
 
 uint64_t stack_manager::assert_last_stack(stack_type expect_type) {
@@ -97,22 +96,18 @@ pair<stack_type, uint64_t> stack_manager::pop() {
 void stack_manager::free_stack(uint64_t last_n) {
     while (last_n != 0) {
         auto popped = pop();
-
         // find references pointing to this stack
         auto find = rev_addr_map.find(stack_length);
         if (find != rev_addr_map.end()) {
             auto addr_name = find->second;
             addr_map.erase(addr_name);
-            rev_addr_map.erase(popped.second);
+            rev_addr_map.erase(stack_length);
         }
 
         if (popped.first == stack_type::STRING) {
             // free dynamically allocated strings
             auto chars = reinterpret_cast<const char*>(popped.second);
             delete[] chars;
-        } else if (popped.first == stack_type::FUNC_PTR) {
-            auto func = reinterpret_cast<class func*>(popped.second);
-            delete func;
         }
         last_n--;
     }

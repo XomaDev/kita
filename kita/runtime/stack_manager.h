@@ -12,9 +12,11 @@
 #include <string>
 #include <cstdint>
 #include "stack_type.h"
-#include "func.h"
+#include "func_obj.h"
 
 using namespace std;
+
+class func_obj;
 
 class stack_manager {
     vector<pair<stack_type, uint64_t>> main_stack;
@@ -28,10 +30,8 @@ public:
     uint64_t stack_depth = 0;
 
     void move_addr(const string &name, bool overwrite);
-    void move_addr_depth(uint64_t depth, const string &name, bool overwrite);
     uint64_t access_addr(const string &name);
-
-    class func * access_func(const string &name);
+    func_obj * lookup_func(const string &name);
 
     uint64_t assert_last_stack(stack_type expect_type);
 
@@ -45,6 +45,8 @@ public:
     pair<stack_type, uint64_t> pop();
 
     void free_stack(uint64_t last_n);
+
+    void move_addr(uint64_t depth, const string &name, bool overwrite);
 };
 
 

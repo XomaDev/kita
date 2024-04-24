@@ -7,16 +7,28 @@
 #include <cstring>
 #include "runtime.h"
 #include "stack_type.h"
-#include "func.h"
+#include "func_obj.h"
 
 void runtime::run() {
     while (!isEOF()) {
-        exec_next();
+        auto code = exec_next();
+        if (code != 0) {
+            if (code == 2) {
+                // pop last value and display it here
+                cout << "Program exited with value " << last_call_result.second << endl;
+                break;
+            }
+//            if (last_call_markup != -1) {
+//                break;
+//            } else {
+//                index = last_call_markup;
+//            }
+        }
     }
     free_memory();
 }
 
-void runtime::exec_next() {
+int runtime::exec_next() {
     auto byte_code = advance();
     switch (static_cast<bytecode>(byte_code)) {
         case bytecode::LOAD:
@@ -32,15 +44,43 @@ void runtime::exec_next() {
             declare();
             break;
         case bytecode::IF:
-            if_decl();
-            break;
+            return if_decl();
+        case bytecode::RETURN:
+            return return_decl();
         case bytecode::FUNC:
-            fun_decl();
+            func_decl();
             break;
         default: {
             throw runtime_error("Unknown bytecode " + to_string(byte_code));
         }
     }
+    return 0;
+}
+
+int runtime::return_decl() {
+    auto result_code = advance() == 1 ? 1 : 2;
+    if (result_code == 2) {
+        // something has been returned
+        last_call_result = stack.pop_value();
+    }
+    return result_code;
+}
+
+void runtime::func_decl() {
+    auto func_name = read_string();
+    auto return_type = advance_bytecode();
+    auto args_size = static_cast<uint8_t>(advance());
+    vector<pair<bytecode, string>> parameters;
+    for (uint8_t i = 0; i < args_size; i++) {
+        auto arg_class = advance_bytecode();
+        auto arg_name = read_string();
+        parameters.emplace_back(arg_class, arg_name);
+    }
+    long func_index = index;
+    pass_scope();
+    auto func = new func_obj(func_name, return_type, args_size, parameters, func_index);
+    stack.push(stack_type::FUNC_PTR, reinterpret_cast<uint64_t>(func));
+    stack.move_addr("func@" + func_name, false);
 }
 
 void runtime::load() {
@@ -177,7 +217,7 @@ void runtime::binary_addition() {
         stack.push_int(static_cast<int64_t>(left.second) + static_cast<int>(right.second));
         return;
     }
-    auto concatenated = (new string(element_to_string(left) + element_to_string(right)))->c_str();
+    auto concatenated = (new string(element_to_string(right) + element_to_string(left)))->c_str();
     stack.push(stack_type::STRING, reinterpret_cast<uint64_t>(concatenated));
 }
 
@@ -191,7 +231,7 @@ string runtime::element_to_string(pair<stack_type, uint64_t> element) {
 }
 
 void runtime::invoke() {
-    int num_args = advance();
+    auto num_args = static_cast<uint8_t>(advance());
     int method = advance();
     switch (static_cast<bytecode>(method)) {
         case bytecode::DISP: {
@@ -201,11 +241,13 @@ void runtime::invoke() {
             }
             break;
         }
-        case bytecode::NAME_TYPE: {
-            // custom func invocation
-            func_invoke(num_args);
+        case bytecode::SCOPE: {
+            stack.push_int(stack.stack_depth);
             break;
         }
+        case bytecode::NAME_TYPE:
+            func_invoke(num_args);
+            break;
         default: {
             throw runtime_error("Unknown method code " + to_string(method));
         }
@@ -213,14 +255,19 @@ void runtime::invoke() {
 }
 
 void runtime::func_invoke(int num_args) {
-    auto func = stack.access_func("func@" + read_string());
-    func->verify_signature(num_args, stack);
+    auto name = read_string();
+    auto func_obj = stack.lookup_func("func@" + name);
+    func_obj->prepare(num_args, &stack);
 
-    long curr_cursor = index;
-    index = func->index;
-    evaluate_scope();
-    stack.free_stack(func->parameters.size());
-    index = curr_cursor;
+    auto last_call_markup = index;
+    index = func_obj->index;
+    auto result_code = evaluate_scope();
+
+    stack.free_stack(num_args);
+    if (result_code == 2) {
+        stack.push(last_call_result.first, last_call_result.second);
+    }
+    index = last_call_markup;
 }
 
 void runtime::declare() {
@@ -247,7 +294,7 @@ void runtime::declare() {
     stack.move_addr("var@" + name, false);
 }
 
-void runtime::if_decl() {
+int runtime::if_decl() {
     auto eq_value = stack.pop_value();
     if (eq_value.first != stack_type::BOOL) {
         throw runtime_error("If (*non-bool*expr) found");
@@ -255,43 +302,34 @@ void runtime::if_decl() {
     bool has_else_branch = advance() == 1;
 
     if (eq_value.second == 1) {
-        evaluate_scope(); // evaluate *body*
+        auto code = evaluate_scope(); // evaluate *body*
+        if (code != 0) return code;
         if (has_else_branch) pass_scope(); // skip else *body*
     } else {
         pass_scope(); // skip *body*
-        if (has_else_branch) evaluate_scope(); // evaluate else *body*;
+        if (has_else_branch) {
+            // evaluate else *body*;
+            auto code = evaluate_scope();
+            if (code != 0) return code;
+        }
     }
+    return 0;
 }
 
-void runtime::fun_decl() {
-    auto func_name = read_string();
-    uint8_t args_count = advance();
+int runtime::evaluate_scope() {
+    int scope_size = read_int32();
 
-    vector<string> parameter_names;
-    vector<bytecode> parameter_types;
-
-    while (args_count) {
-        int class_type = advance();
-        string name = read_string();
-
-        parameter_names.emplace_back(name);
-        parameter_types.emplace_back(static_cast<bytecode>(class_type));
-        args_count--;
-    }
-    auto func_decl = new func(index, func_name, parameter_names, parameter_types);
-    pass_scope();
-
-    stack.push(stack_type::FUNC_PTR, reinterpret_cast<uint64_t>(func_decl));
-    stack.move_addr("func@" + func_name, false);
-}
-
-void runtime::evaluate_scope() {
-    index += 4;
     expect(bytecode::SCOPE_START);
     auto stack_len_before = stack.stack_length;
     stack.stack_depth++;
+
+    auto result_code = 0;
     for (;;) {
-        exec_next();
+        auto code = exec_next();
+        if (code != 0) {
+            result_code = code;
+            break;
+        }
         if (static_cast<bytecode>(peek()) == bytecode::SCOPE_END) {
             index++;
             break;
@@ -299,12 +337,10 @@ void runtime::evaluate_scope() {
     }
     stack.stack_depth--;
     auto stack_len_after = stack.stack_length;
-    if (stack_len_before != stack_len_after) {
-        // stack_len_after > stack_len_before
-
-        // time to free up this stack
+    if (stack_len_before < stack_len_after) {
         stack.free_stack(stack_len_after - stack_len_before);
     }
+    return result_code;
 }
 
 void runtime::pass_scope() {
@@ -338,6 +374,10 @@ void runtime::expect(bytecode code) {
     if (next_bytecode != expected) {
         throw runtime_error("Expected " + to_string(expected) + ", but got " + to_string(next_bytecode));
     }
+}
+
+bytecode runtime::advance_bytecode() {
+    return static_cast<bytecode>(advance());
 }
 
 uchar runtime::advance() {

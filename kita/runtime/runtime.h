@@ -22,6 +22,9 @@ class runtime {
 
     long index = 0;
 
+    // long last_call_markup = -1;
+    pair<stack_type, uint64_t> last_call_result;
+
     // philosophy: do not include intermediate EOF checks that may make
     // execution a bit slower, assuming bytecode is absolutely right
 
@@ -32,13 +35,17 @@ class runtime {
 
     void expect(bytecode code);
 
+    bytecode advance_bytecode();
     uchar peek();
     uchar advance();
 
     [[nodiscard]] bool isEOF() const;
 
-    void exec_next();
+    int exec_next();
     void load();
+
+    int return_decl();
+    void func_decl();
 
     void binary_operation();
 
@@ -48,24 +55,23 @@ class runtime {
     static string element_to_string(pair<stack_type, uint64_t> element);
 
     void invoke();
-    void func_invoke(int num_args);
+    void func_invoke(int i);
 
     void declare();
 
-    void if_decl();
-    void fun_decl();
+    int if_decl();
 
-    void evaluate_scope();
+    int evaluate_scope();
     void pass_scope();
 
     void free_memory();
-
 public:
     runtime(unique_ptr<uchar[]> bytes, long length) : bytes(std::move(bytes)), length(length) {
         // constructor initialized
     }
 
     void run();
+
 };
 
 

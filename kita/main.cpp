@@ -54,7 +54,11 @@ int main() {
     auto parser = new class parser(std::move(tokens));
     parser->parse();
 
-    auto dump = new class dump(compiled_file, std::move(parser->expressions));
+    auto parsed = std::move(parser->expressions);
+    for (auto &element : parsed) {
+        cout << element->to_string() << endl;
+    }
+    auto dump = new class dump(compiled_file, std::move(parsed));
 
     delete parser;
     delete dump;

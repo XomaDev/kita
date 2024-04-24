@@ -28,6 +28,8 @@ add_executable(kita main.cpp
         runtime/stack_type.h
         runtime/stack_manager.cpp
         runtime/stack_manager.h
-        runtime/func.cpp
-        runtime/func.h
+        compiler/expr/expr_return.h
+        compiler/expr/expr_class.h
+        runtime/func_obj.cpp
+        runtime/func_obj.h
 )
