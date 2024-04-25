@@ -9,11 +9,11 @@
 #include <utility>
 #include <vector>
 #include "../bytecode.h"
-#include "stack_manager.h"
+#include "memory_manager.h"
 
 using namespace std;
 
-class stack_manager;
+class memory_manager;
 
 class func_obj {
     string name;
@@ -28,7 +28,7 @@ public:
         // constructor initialized
     }
 
-    void prepare(uint8_t args, stack_manager *stack);
+    void prepare(uint8_t args, memory_manager *memory);
 };
 
 

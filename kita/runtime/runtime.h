@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include "stack_type.h"
 #include "../bytecode.h"
-#include "stack_manager.h"
+#include "memory_manager.h"
 
 using namespace std;
 
@@ -25,10 +25,7 @@ class runtime {
     // long last_call_markup = -1;
     pair<stack_type, uint64_t> last_call_result;
 
-    // philosophy: do not include intermediate EOF checks that may make
-    // execution a bit slower, assuming bytecode is absolutely right
-
-    stack_manager stack;
+    memory_manager memory;
 
     string read_string();
     int read_int32();
@@ -61,7 +58,7 @@ class runtime {
 
     int if_decl();
 
-    int evaluate_scope();
+    int evaluate_scope(bool new_frame);
     void pass_scope();
 
     void free_memory();

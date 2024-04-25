@@ -5,14 +5,14 @@
 #include <stdexcept>
 #include "func_obj.h"
 
-void func_obj::prepare(uint8_t args, stack_manager *stack) {
+void func_obj::prepare(uint8_t args, memory_manager *memory) {
     if (this->args_size != args) {
         throw runtime_error("Expected " + to_string(this->args_size) + " for function '"
                     + name + ", but got" + to_string(args));
     }
-    auto function_depth = stack->stack_depth + 1;
+    pair<stack_type, uint64_t> values[args_size];
     for (uint8_t i = 0; i < args; i++) {
-        auto value = stack->pop_value();
+        auto value = memory->pop_value();
         bool success;
         switch (value.first) {
             case stack_type::INT:
@@ -32,7 +32,12 @@ void func_obj::prepare(uint8_t args, stack_manager *stack) {
             throw runtime_error("Expected parameter type " + to_string(static_cast<int>(parameters[i].first))
                                 + ", but got " + to_string(static_cast<int>(value.first)));
         }
-        stack->push(value.first, value.second);
-        stack->move_addr(function_depth, "var@" + parameters[i].second, false);
+        values[i] = value;
+    }
+    memory->push_frame();
+    for (uint8_t i = 0; i < args; i++) {
+        auto value = values[i];
+        memory->push(value.first, value.second);
+        memory->move_address("var@" + parameters[i].second);
     }
 }

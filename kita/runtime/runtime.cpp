@@ -18,11 +18,6 @@ void runtime::run() {
                 cout << "Program exited with value " << last_call_result.second << endl;
                 break;
             }
-//            if (last_call_markup != -1) {
-//                break;
-//            } else {
-//                index = last_call_markup;
-//            }
         }
     }
     free_memory();
@@ -61,7 +56,7 @@ int runtime::return_decl() {
     auto result_code = advance() == 1 ? 1 : 2;
     if (result_code == 2) {
         // something has been returned
-        last_call_result = stack.pop_value();
+        last_call_result = memory.pop_value();
     }
     return result_code;
 }
@@ -79,8 +74,8 @@ void runtime::func_decl() {
     long func_index = index;
     pass_scope();
     auto func = new func_obj(func_name, return_type, args_size, parameters, func_index);
-    stack.push(stack_type::FUNC_PTR, reinterpret_cast<uint64_t>(func));
-    stack.move_addr("func@" + func_name, false);
+    memory.push(stack_type::FUNC_PTR, reinterpret_cast<uint64_t>(func));
+    memory.move_address("func@" + func_name);
 }
 
 void runtime::load() {
@@ -88,17 +83,18 @@ void runtime::load() {
     switch (static_cast<bytecode>(type)) {
         case bytecode::BOOL_TYPE: {
             bool value = advance() == 1;
-            stack.push(stack_type::BOOL, value);
+            memory.push(stack_type::BOOL, value);
             break;
         }
         case bytecode::INT_TYPE: {
             int value = read_int32();
-            stack.push_int(value);
+            memory.push_int(value);
             break;
         }
         case bytecode::NAME_TYPE: {
             string name = read_string();
-            stack.push(stack_type::PTR, stack.access_addr("var@" + name));
+            auto address = memory.access_address("var@" + name);
+            memory.push(stack_type::PTR, reinterpret_cast<uint64_t>(address));
             break;
         }
         case bytecode::STRING_TYPE: {
@@ -106,7 +102,7 @@ void runtime::load() {
             char* chars = new char[content.size() + 1];
             strcpy(chars, content.c_str());
 
-            stack.push(stack_type::STRING, reinterpret_cast<uint64_t>(chars));
+            memory.push(stack_type::STRING, reinterpret_cast<uint64_t>(chars));
             break;
         }
         default: {
@@ -123,66 +119,66 @@ void runtime::binary_operation() {
             break;
         }
         case bytecode::NEG: {
-            auto r = stack.pop_int(), l = stack.pop_int();
-            stack.push_int(l - r);
+            auto r = memory.pop_int(), l = memory.pop_int();
+            memory.push_int(l - r);
             break;
         }
         case bytecode::MUL: {
-            auto r = stack.pop_int(), l = stack.pop_int();
-            stack.push_int(l * r);
+            auto r = memory.pop_int(), l = memory.pop_int();
+            memory.push_int(l * r);
             break;
         }
         case bytecode::DIV: {
-            auto r = stack.pop_int(), l = stack.pop_int();
-            stack.push_int(l / r);
+            auto r = memory.pop_int(), l = memory.pop_int();
+            memory.push_int(l / r);
             break;
         }
         case bytecode::BITWISE_AND: {
-            auto r = stack.pop_int(), l = stack.pop_int();
-            stack.push_int(l & r);
+            auto r = memory.pop_int(), l = memory.pop_int();
+            memory.push_int(l & r);
             break;
         }
         case bytecode::BITWISE_OR: {
-            auto r = stack.pop_int(), l = stack.pop_int();
-            stack.push_int(l | r);
+            auto r = memory.pop_int(), l = memory.pop_int();
+            memory.push_int(l | r);
             break;
         }
         case bytecode::LOGICAL_AND: {
-            auto r = stack.pop_int(), l = stack.pop_int();
-            stack.push(stack_type::BOOL, l && r);
+            auto r = memory.pop_int(), l = memory.pop_int();
+            memory.push(stack_type::BOOL, l && r);
             break;
         }
         case bytecode::LOGICAL_OR: {
-            auto r = stack.pop_int(), l = stack.pop_int();
-            stack.push(stack_type::BOOL, l || r);
+            auto r = memory.pop_int(), l = memory.pop_int();
+            memory.push(stack_type::BOOL, l || r);
             break;
         }
         case bytecode::EQUALS: {
-            stack.push(stack_type::BOOL, binary_equals());
+            memory.push(stack_type::BOOL, binary_equals());
             break;
         }
         case bytecode::NOT_EQUALS: {
-            stack.push(stack_type::BOOL, !binary_equals());
+            memory.push(stack_type::BOOL, !binary_equals());
             break;
         }
         case bytecode::GREATER_THAN: {
-            auto r = stack.pop_int(), l = stack.pop_int();
-            stack.push(stack_type::BOOL, l > r);
+            auto r = memory.pop_int(), l = memory.pop_int();
+            memory.push(stack_type::BOOL, l > r);
             break;
         }
         case bytecode::LESSER_THAN: {
-            auto r = stack.pop_int(), l = stack.pop_int();
-            stack.push(stack_type::BOOL, l < r);
+            auto r = memory.pop_int(), l = memory.pop_int();
+            memory.push(stack_type::BOOL, l < r);
             break;
         }
         case bytecode::GREATER_EQUALS: {
-            auto r = stack.pop_int(), l = stack.pop_int();
-            stack.push(stack_type::BOOL, l >= r);
+            auto r = memory.pop_int(), l = memory.pop_int();
+            memory.push(stack_type::BOOL, l >= r);
             break;
         }
         case bytecode::LESSER_EQUALS: {
-            auto r = stack.pop_int(), l = stack.pop_int();
-            stack.push(stack_type::BOOL, l <= r);
+            auto r = memory.pop_int(), l = memory.pop_int();
+            memory.push(stack_type::BOOL, l <= r);
             break;
         }
         default: {
@@ -192,7 +188,7 @@ void runtime::binary_operation() {
 }
 
 bool runtime::binary_equals() {
-    auto r = stack.pop_value(), l = stack.pop_value();
+    auto r = memory.pop_value(), l = memory.pop_value();
     if (r.first != l.first) {
         // false if not same type
         return false;
@@ -212,13 +208,13 @@ bool runtime::binary_equals() {
 
 void runtime::binary_addition() {
     // not just limited to Int + Int, includes String too
-    auto right = stack.pop_value(), left = stack.pop_value();
+    auto right = memory.pop_value(), left = memory.pop_value();
     if (left.first == stack_type::INT && right.first == stack_type::INT) {
-        stack.push_int(static_cast<int64_t>(left.second) + static_cast<int>(right.second));
+        memory.push_int(static_cast<int64_t>(left.second) + static_cast<int>(right.second));
         return;
     }
     auto concatenated = (new string(element_to_string(right) + element_to_string(left)))->c_str();
-    stack.push(stack_type::STRING, reinterpret_cast<uint64_t>(concatenated));
+    memory.push(stack_type::STRING, reinterpret_cast<uint64_t>(concatenated));
 }
 
 string runtime::element_to_string(pair<stack_type, uint64_t> element) {
@@ -234,20 +230,16 @@ void runtime::invoke() {
     auto num_args = static_cast<uint8_t>(advance());
     int method = advance();
     switch (static_cast<bytecode>(method)) {
+        case bytecode::NAME_TYPE:
+            func_invoke(num_args);
+            break;
         case bytecode::DISP: {
             for (int i = 0; i < num_args; i++) {
-                auto value = stack.pop_value();
+                auto value = memory.pop_value();
                 cout << element_to_string(value) << endl;
             }
             break;
         }
-        case bytecode::SCOPE: {
-            stack.push_int(stack.stack_depth);
-            break;
-        }
-        case bytecode::NAME_TYPE:
-            func_invoke(num_args);
-            break;
         default: {
             throw runtime_error("Unknown method code " + to_string(method));
         }
@@ -256,16 +248,15 @@ void runtime::invoke() {
 
 void runtime::func_invoke(int num_args) {
     auto name = read_string();
-    auto func_obj = stack.lookup_func("func@" + name);
-    func_obj->prepare(num_args, &stack);
+    auto func_obj = memory.lookup_func("func@" + name);
+    func_obj->prepare(num_args, &memory);
 
     auto last_call_markup = index;
     index = func_obj->index;
-    auto result_code = evaluate_scope();
 
-    stack.free_stack(num_args);
+    auto result_code = evaluate_scope(false);
     if (result_code == 2) {
-        stack.push(last_call_result.first, last_call_result.second);
+        memory.push(last_call_result.first, last_call_result.second);
     }
     index = last_call_markup;
 }
@@ -276,53 +267,53 @@ void runtime::declare() {
 
     switch (static_cast<bytecode>(class_type)) {
         case bytecode::BOOL_CLASS: {
-            stack.assert_last_stack(stack_type::BOOL);
+            memory.assert_last(stack_type::BOOL);
             break;
         }
         case bytecode::INT_CLASS: {
-            stack.assert_last_stack(stack_type::INT);
+            memory.assert_last(stack_type::INT);
             break;
         }
         case bytecode::STRING_CLASS: {
-            stack.assert_last_stack(stack_type::STRING);
+            memory.assert_last(stack_type::STRING);
             break;
         }
         default: {
             throw runtime_error("Unknown class type " + to_string(class_type));
         }
     }
-    stack.move_addr("var@" + name, false);
+    memory.move_address("var@" + name);
 }
 
 int runtime::if_decl() {
-    auto eq_value = stack.pop_value();
+    auto eq_value = memory.pop_value();
     if (eq_value.first != stack_type::BOOL) {
         throw runtime_error("If (*non-bool*expr) found");
     }
     bool has_else_branch = advance() == 1;
 
     if (eq_value.second == 1) {
-        auto code = evaluate_scope(); // evaluate *body*
+        auto code = evaluate_scope(true); // evaluate *body*
+
         if (code != 0) return code;
         if (has_else_branch) pass_scope(); // skip else *body*
     } else {
         pass_scope(); // skip *body*
         if (has_else_branch) {
             // evaluate else *body*;
-            auto code = evaluate_scope();
+            auto code = evaluate_scope(true);
             if (code != 0) return code;
         }
     }
     return 0;
 }
 
-int runtime::evaluate_scope() {
-    int scope_size = read_int32();
-
+int runtime::evaluate_scope(bool new_frame) {
+    if (new_frame) {
+        memory.push_frame();
+    }
+    index += 4; // skip scope length headers
     expect(bytecode::SCOPE_START);
-    auto stack_len_before = stack.stack_length;
-    stack.stack_depth++;
-
     auto result_code = 0;
     for (;;) {
         auto code = exec_next();
@@ -335,11 +326,7 @@ int runtime::evaluate_scope() {
             break;
         }
     }
-    stack.stack_depth--;
-    auto stack_len_after = stack.stack_length;
-    if (stack_len_before < stack_len_after) {
-        stack.free_stack(stack_len_after - stack_len_before);
-    }
+    memory.release_frame();
     return result_code;
 }
 
@@ -390,5 +377,5 @@ uchar runtime::peek() {
 
 void runtime::free_memory() {
     // free all memory in stack
-    stack.free_stack(stack.stack_length);
+    memory.free_all();
 }
