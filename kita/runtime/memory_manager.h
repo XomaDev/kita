@@ -31,6 +31,7 @@ public:
     int64_t pop_int();
 
     pair<stack_type, uint64_t> pop_value();
+    pair<stack_type, uint64_t> peek_pop_value();
 
     void assert_last(stack_type type);
 

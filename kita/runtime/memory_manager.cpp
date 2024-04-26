@@ -68,11 +68,15 @@ pair<stack_type, uint64_t> memory_manager::pop_value() {
     return dereference(current_frame->pop());
 }
 
+pair<stack_type, uint64_t > memory_manager::peek_pop_value() {
+    return dereference(frames[current_depth - 2]->pop());
+}
+
 void memory_manager::assert_last(stack_type type) {
     auto element = dereference(current_frame->peek_back());
     if (element.first != type) {
         throw runtime_error("assert_last expected " + to_string(static_cast<int>(type)) + " but got" +
-                                    to_string(static_cast<int>(element.first)));
+                            to_string(static_cast<int>(element.first)));
     }
 }
 
