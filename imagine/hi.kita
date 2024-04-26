@@ -4,4 +4,4 @@ fn Int fib: Int~n {
     }
     return fib(n - 1) + fib(n - 2)
 }
-disp "Fib: result = " + fib(27)
+disp "Fib: " + fib(32)

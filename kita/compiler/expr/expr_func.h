@@ -47,8 +47,8 @@ public:
         func_body->dump(&mem_dump);
 
         // write the size of the scope
-        pDump->write_int(mem_dump.size());
         pDump->write(bytecode::SCOPE_START);
+        pDump->write_int(mem_dump.size());
 
         // transfer content of mem_dump -> pdump
         mem_dump.transfer(pDump);

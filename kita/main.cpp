@@ -68,9 +68,10 @@ int main() {
     auto bytes = read_bytes(compiled_file, file_size);
 
     auto runtime = new class runtime(std::move(bytes), file_size);
-    auto then = std::chrono::duration_cast<chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    runtime->prepare();
+    auto then = std::chrono::duration_cast<chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     runtime->run();
-    auto now = std::chrono::duration_cast<chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    auto now = std::chrono::duration_cast<chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     cout << "Time taken: " << to_string(now - then) + " ns" << endl;
     delete runtime;
     return 0;

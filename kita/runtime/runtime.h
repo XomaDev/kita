@@ -10,17 +10,28 @@
 #include <array>
 #include <id3/globals.h>
 #include <unordered_map>
+#include <optional>
 #include "stack_type.h"
 #include "../bytecode.h"
+#include "visitable.h"
 #include "memory_manager.h"
 
 using namespace std;
+
+class visitable;
+class memory_manager;
 
 class runtime {
     unique_ptr<uchar[]> bytes;
     long length;
 
     long index = 0;
+
+    vector<visitable> instructions;
+    ulong instruction_index = 0;
+
+    vector<visitable> ondemand_visitables;
+    ulong ondemand_index = 0;
 
     // long last_call_markup = -1;
     pair<stack_type, uint64_t> last_call_result;
@@ -38,37 +49,36 @@ class runtime {
 
     [[nodiscard]] bool isEOF() const;
 
-    int exec_next();
-    void load();
+    optional<visitable> encapsule_next();
+    visitable load();
 
-    int return_decl();
-    void func_decl();
+    visitable return_decl();
+    visitable func_decl();
 
-    void binary_operation();
+    visitable binary_operation();
 
     bool binary_equals();
-    void binary_addition();
+    visitable binary_addition();
 
     static string element_to_string(pair<stack_type, uint64_t> element);
 
-    void invoke();
-    void func_invoke(int i);
+    visitable invoke();
+    visitable func_invoke(int i);
 
-    void declare();
+    visitable declare();
 
-    int if_decl();
+    visitable if_decl();
 
-    int evaluate_scope(bool new_frame);
-    void pass_scope();
-
+    visitable encapsule_scope(bool push_frame);
     void free_memory();
 public:
     runtime(unique_ptr<uchar[]> bytes, long length) : bytes(std::move(bytes)), length(length) {
         // constructor initialized
     }
 
-    void run();
+    void prepare();
 
+    void run();
 };
 
 

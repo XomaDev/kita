@@ -34,4 +34,5 @@ add_executable(kita main.cpp
         runtime/stack_frame.h
         runtime/memory_manager.cpp
         runtime/memory_manager.h
+        runtime/visitable.h
 )

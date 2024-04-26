@@ -3,7 +3,6 @@
 //
 
 #include <stdexcept>
-#include <iostream>
 #include "memory_manager.h"
 
 void memory_manager::push_frame() {

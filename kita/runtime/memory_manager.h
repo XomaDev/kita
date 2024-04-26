@@ -19,7 +19,7 @@ class memory_manager {
 
     long current_depth = 0;
 public:
-    memory_manager() {
+    memory_manager() { // NOLINT(*-pro-type-member-init)
         push_frame();
     }
     void push_frame();

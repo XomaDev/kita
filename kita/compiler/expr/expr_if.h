@@ -37,23 +37,22 @@ public:
         class dump mem_dump;
         if_body->dump(&mem_dump);
 
-        // if true *body* branch
-        pDump->write_int(mem_dump.size());
-        cout << "Size: " << std::to_string(mem_dump.size()) << endl;
-
         pDump->write(bytecode::SCOPE_START);
 
+        // if true *body* branch size
+        pDump->write_int(mem_dump.size());
+
+        // if true *body*
         mem_dump.transfer(pDump);
         pDump->write(bytecode::SCOPE_END);
 
         if (else_body != nullptr) {
             class dump re_mem_dump;
-            cout << "Size: " << re_mem_dump.size() << endl;
             else_body->dump(&re_mem_dump);
 
             // else *body* branch
-            pDump->write_int(re_mem_dump.size());
             pDump->write(bytecode::SCOPE_START);
+            pDump->write_int(re_mem_dump.size());
             re_mem_dump.transfer(pDump);
             pDump->write(bytecode::SCOPE_END);
         }

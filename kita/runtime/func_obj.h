@@ -14,6 +14,7 @@
 using namespace std;
 
 class memory_manager;
+class visitable;
 
 class func_obj {
     string name;
@@ -21,10 +22,11 @@ class func_obj {
     vector<pair<bytecode, string>> parameters;
 public:
     bytecode return_type;
-    long index;
+    ulong visitable_index;
 
-    func_obj(string name, bytecode return_type, u_int8_t args_size, vector<pair<bytecode, string>> parameters, long index)
-                    : name(std::move(name)), return_type(return_type), args_size(args_size), parameters(std::move(parameters)), index(index) {
+    func_obj(string name, bytecode return_type, u_int8_t args_size, vector<pair<bytecode, string>> parameters, ulong visitable_index)
+                    : name(std::move(name)), return_type(return_type), args_size(args_size),
+                    parameters(std::move(parameters)), visitable_index(visitable_index) {
         // constructor initialized
     }
 
