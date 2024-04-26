@@ -75,15 +75,14 @@ visitable runtime::func_decl() {
     auto func_name = read_string();
     auto return_type = advance_bytecode();
     auto args_size = static_cast<uint8_t>(advance());
-    vector<pair<bytecode, string>> parameters;
+
+    vector<string> parameter_names;
     for (uint8_t i = 0; i < args_size; i++) {
-        auto arg_class = advance_bytecode();
-        auto arg_name = read_string();
-        parameters.emplace_back(arg_class, arg_name);
+        parameter_names.emplace_back(read_string());
     }
     auto func_body = encapsule_scope(false);
     ondemand_visitables.emplace_back(func_body);
-    auto func = new func_obj(func_name, return_type, args_size, parameters, ondemand_index++);
+    auto func = new func_obj(func_name, return_type, args_size, parameter_names, ondemand_index++);
     auto declare_name = "func@" + func_name;
     return visitable {
         [declare_name, func, this]() {

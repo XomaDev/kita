@@ -35,4 +35,5 @@ add_executable(kita main.cpp
         runtime/memory_manager.cpp
         runtime/memory_manager.h
         runtime/visitable.h
+        compiler/expr/expr_name.h
 )

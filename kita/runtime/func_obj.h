@@ -19,14 +19,14 @@ class visitable;
 class func_obj {
     string name;
     u_int8_t args_size;
-    vector<pair<bytecode, string>> parameters;
+    vector<string> parameter_names;
 public:
     bytecode return_type;
     ulong visitable_index;
 
-    func_obj(string name, bytecode return_type, u_int8_t args_size, vector<pair<bytecode, string>> parameters, ulong visitable_index)
+    func_obj(string name, bytecode return_type, u_int8_t args_size, vector<string> parameter_names, ulong visitable_index)
                     : name(std::move(name)), return_type(return_type), args_size(args_size),
-                    parameters(std::move(parameters)), visitable_index(visitable_index) {
+                      parameter_names(parameter_names), visitable_index(visitable_index) {
         // constructor initialized
     }
 

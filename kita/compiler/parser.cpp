@@ -14,6 +14,7 @@
 #include "expr/expr_inlineif.h"
 #include "expr/expr_return.h"
 #include "expr/expr_class.h"
+#include "expr/expr_name.h"
 
 using namespace std;
 
@@ -84,14 +85,14 @@ unique_ptr<expr_func> parser::function_decl() {
     vector<unique_ptr<expr_base>> type_args;
     if (peek()->has_type("Colon")) {
         skip(); // eat ':'
-        // read function arguments seperated by _
-        type_args.emplace_back(type_decl(next(), true));
+        // read function parameter names seperated by _
+        type_args.emplace_back(std::make_unique<expr_name>(std::move(strict_match("Identifier"))));
         while (!isEOF() && peek()->first_type == "With") {
             skip(); // eat '_'
-            type_args.emplace_back(type_decl(next(), true));
+            type_args.emplace_back(std::make_unique<expr_name>(std::move(strict_match("Identifier"))));
         }
     }
-    auto type_args_group = make_unique<expr_group>(std::move(type_args));
+    auto args_group = make_unique<expr_group>(std::move(type_args));
 
     bool inline_expr = false;
     unique_ptr<expr_group> func_body;
@@ -104,7 +105,7 @@ unique_ptr<expr_func> parser::function_decl() {
     } else {
         func_body = read_body();
     }
-    return make_unique<expr_func>(function_name, std::move(ret_class), std::move(func_body), std::move(type_args_group));
+    return make_unique<expr_func>(function_name, std::move(ret_class), std::move(func_body), std::move(args_group));
 }
 
 unique_ptr<expr_group> parser::read_body() {
