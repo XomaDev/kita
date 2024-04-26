@@ -145,6 +145,7 @@ visitable runtime::load() {
 
 visitable runtime::binary_operation() {
     auto binary_op = advance();
+
     switch (static_cast<bytecode>(binary_op)) {
         case bytecode::ADD: {
             return binary_addition();
@@ -298,7 +299,7 @@ visitable runtime::binary_addition() {
                 memory.push_int(static_cast<int64_t>(left.second) + static_cast<int>(right.second));
                 return 0;
             }
-            auto concatenated = (new string(element_to_string(right) + element_to_string(left)))->c_str();
+            auto concatenated = (new string(element_to_string(left) + element_to_string(right)))->c_str();
             memory.push(stack_type::STRING, reinterpret_cast<uint64_t>(concatenated));
             return 0;
         }

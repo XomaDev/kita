@@ -23,16 +23,8 @@ public:
     }
 
     void dump(class dump *pDump) override {
-        if (left->is_leaf() && right->is_leaf() || !left->is_leaf()) {
-            // both leaves or left is leaf
-            left->dump(pDump);
-            right->dump(pDump);
-        } else if (left->is_leaf() && !right->is_leaf()){
-            // right is leaf
-            // [1, add[2, 3]]
-            right->dump(pDump);
-            left->dump(pDump);
-        }
+        left->dump(pDump);
+        right->dump(pDump);
 
         pDump->write(bytecode::BINARY_OP);
 

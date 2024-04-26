@@ -1,7 +1,5 @@
-fn Int fib: Int~n {
-    if (n < 2) {
-        return n
-    }
-    return fib(n - 1) + fib(n - 2)
+fn String hewwo {
+    return "meow"
 }
-disp "Fib: " + fib(32)
+
+disp "name is " + hewwo()
