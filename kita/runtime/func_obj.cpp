@@ -13,8 +13,8 @@ void func_obj::prepare(uint8_t args, memory_manager *memory) {
     }
     memory->push_frame();
     for (uint8_t i = 0; i < args; i++) {
-        auto value = memory->peek_pop_value();
-        memory->push(value.first, value.second);
+        // pop() from the last frame, push it to current frame
+        memory->relocate_last();
         memory->move_address("var@" + parameter_names[i]);
     }
 }

@@ -68,8 +68,9 @@ pair<stack_type, uint64_t> memory_manager::pop_value() {
     return dereference(current_frame->pop());
 }
 
-pair<stack_type, uint64_t > memory_manager::peek_pop_value() {
-    return dereference(frames[current_depth - 2]->pop());
+void memory_manager::relocate_last() {
+    auto value = dereference(frames[current_depth - 2]->pop());
+    push(value.first, value.second);
 }
 
 void memory_manager::assert_last(stack_type type) {
