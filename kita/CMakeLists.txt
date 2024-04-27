@@ -36,4 +36,7 @@ add_executable(kita main.cpp
         runtime/memory_manager.h
         runtime/visitable.h
         compiler/expr/expr_name.h
+        runtime/name_resolver.cpp
+        runtime/name_resolver.h
+        runtime/address.h
 )

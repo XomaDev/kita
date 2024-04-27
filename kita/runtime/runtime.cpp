@@ -76,18 +76,20 @@ visitable runtime::func_decl() {
     auto return_type = advance_bytecode();
     auto args_size = static_cast<uint8_t>(advance());
 
-    vector<string> parameter_names;
+    resolver.declare("func@" + func_name);
+    resolver.enter_frame();
     for (uint8_t i = 0; i < args_size; i++) {
-        parameter_names.emplace_back(read_string());
+        auto name = read_string();
+        resolver.declare("var@" + name);
     }
     auto func_body = encapsule_scope(false);
     ondemand_visitables.emplace_back(func_body);
-    auto func = new func_obj(func_name, return_type, args_size, parameter_names, ondemand_index++);
-    auto declare_name = "func@" + func_name;
+    auto func = new func_obj(func_name, return_type, args_size, ondemand_index++);
+
     return visitable {
-        [declare_name, func, this]() {
+        [func, this]() {
             memory.push(stack_type::FUNC_PTR, reinterpret_cast<uint64_t>(func));
-            memory.move_address(declare_name);
+            memory.move_address();
             return 0;
         }
     };
@@ -116,10 +118,11 @@ visitable runtime::load() {
         }
         case bytecode::NAME_TYPE: {
             string name = read_string();
+            auto address = resolver.resolve("var@" + name, false);
             return visitable {
-                [name, this]() {
-                    auto address = memory.access_address("var@" + name);
-                    memory.push(stack_type::PTR, reinterpret_cast<uint64_t>(address));
+                [address, this]() {
+                    auto pointer = memory.access_address(address);
+                    memory.push(stack_type::PTR, reinterpret_cast<uint64_t>(pointer));
                     return 0;
                 }
             };
@@ -339,10 +342,10 @@ visitable runtime::invoke() {
 
 visitable runtime::func_invoke(int num_args) {
     auto name = read_string();
-    auto lookup_name = "func@" + name;
+    auto address = resolver.resolve("func@" + name, true);
     return visitable {
-        [num_args, lookup_name, this]() {
-            auto func_obj = memory.lookup_func(lookup_name);
+        [num_args, address, this]() {
+            auto func_obj = memory.lookup_func(address);
             func_obj->prepare(num_args, &memory);
 
             auto func_body = ondemand_visitables[func_obj->visitable_index];
@@ -377,11 +380,11 @@ visitable runtime::declare() {
             throw runtime_error("Unknown class type " + to_string(class_type));
         }
     }
-    auto declare_name = "var@" + name;
+    resolver.declare("var@" + name);
     return visitable {
-        [type, declare_name, this]() {
+        [type, this]() {
             memory.assert_last(type);
-            memory.move_address(declare_name);
+            memory.move_address();
             return 0;
         }
     };
@@ -416,6 +419,9 @@ visitable runtime::encapsule_scope(bool push_frame) {
     vector<visitable> local_instructions;
     expect(bytecode::SCOPE_START);
     index += 4; // skip scope length headers
+    if (push_frame) {
+        resolver.enter_frame();
+    }
     for (;;) {
         auto next = encapsule_next();
         if (next) {
@@ -426,6 +432,7 @@ visitable runtime::encapsule_scope(bool push_frame) {
             break;
         }
     }
+    resolver.exit_fame();
     return visitable {
         [push_frame, local_instructions, this]() {
             if (push_frame) {

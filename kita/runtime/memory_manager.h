@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include "stack_frame.h"
+#include "address.h"
 
 using namespace std;
 
@@ -34,11 +35,11 @@ public:
 
     void assert_last(stack_type type);
 
-    func_obj *lookup_func(const string &name);
+    func_obj *lookup_func(address address);
 
-    void move_address(const string &name);
+    void move_address();
 
-    pair<long, unsigned long> * access_address(const string &name);
+    pair<ulong, ulong> * access_address(address address);
 
     void free_all();
 

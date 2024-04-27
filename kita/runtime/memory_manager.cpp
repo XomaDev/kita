@@ -3,7 +3,9 @@
 //
 
 #include <stdexcept>
+#include <iostream>
 #include "memory_manager.h"
+#include "address.h"
 
 void memory_manager::push_frame() {
     current_frame = new stack_frame(current_depth++);
@@ -18,34 +20,23 @@ void memory_manager::release_frame() {
     current_frame = frames.back();
 }
 
-void memory_manager::move_address(const string &name) {
-    return current_frame->move_address(name);
+void memory_manager::move_address() {
+    return current_frame->move_address();
 }
 
-pair<long, unsigned long>* memory_manager::access_address(const string &name) {
-    long search_depth = current_depth;
-    while (search_depth) {
-        auto frame = frames[--search_depth];
-        auto result = frame->access_address(name);
-        if (result.first) {
-            return new pair(search_depth, result.second);
-        }
-    }
-    throw runtime_error("access_address, looked in all depths, cannot find address " + name);
+pair<ulong, ulong>* memory_manager::access_address(address addr) {
+    auto frame_index = addr.static_definition ? addr.scope : current_depth - addr.scope - 1;
+    auto result = frames[frame_index]->access_address(addr.index);
+    return new pair(frame_index, result);
 }
 
-func_obj* memory_manager::lookup_func(const string &name) {
-    for (long i = 0; i < current_depth; i++) {
-        auto frame = frames[i];
-        auto result = frame->access_address(name);
-        if (result.first) {
-            auto pointer = frame->stack[result.second];
-            if (pointer.first == stack_type::FUNC_PTR) {
-                return reinterpret_cast<func_obj *>(pointer.second);
-            }
-        }
+func_obj* memory_manager::lookup_func(address address) {
+    auto frame = frames[address.scope];
+    auto pointer = frame->stack[address.index];
+    if (pointer.first == stack_type::FUNC_PTR) {
+        return reinterpret_cast<func_obj *>(pointer.second);
     }
-    throw runtime_error("lookup_func, looked in all depths, cannot find function " + name);
+    throw runtime_error("lookup_func, looked in all depths, cannot find address " + address.print());
 }
 
 void memory_manager::push(stack_type type, uint64_t value) {
@@ -82,16 +73,13 @@ void memory_manager::assert_last(stack_type type) {
 }
 
 pair<stack_type, uint64_t> memory_manager::dereference(pair<stack_type, uint64_t> element) {
-    for (;;) {
-        if (element.first == stack_type::PTR) {
-            auto pair = reinterpret_cast<::pair<long, unsigned long>*>(element.second);
-            auto depth = pair->first;
-            auto stack_index = pair->second;
-            return frames[depth]->stack[stack_index];
-        } else {
-            return element;
-        }
+    if (element.first == stack_type::PTR) {
+        auto pair = reinterpret_cast<::pair<long, unsigned long>*>(element.second);
+        auto result = frames[pair->first]->stack[pair->second];
+        delete pair;
+        return result;
     }
+    return element;
 }
 
 void memory_manager::free_all() {

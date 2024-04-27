@@ -6,16 +6,12 @@
 #include <iostream>
 #include "stack_frame.h"
 
-void stack_frame::move_address(const string &name) {
-    addresses[name] = stack_length - 1;
+void stack_frame::move_address() {
+    addresses.emplace_back(stack_length - 1);
 }
 
-pair<bool, uint64_t> stack_frame::access_address(const string &name) {
-    auto find = addresses.find(name);
-    if (find != addresses.end()) {
-        return { true, find->second };
-    }
-    return { false, 0 };
+uint64_t stack_frame::access_address(ulong index) {
+    return addresses[index];
 }
 
 void stack_frame::push(stack_type type, uint64_t value) {

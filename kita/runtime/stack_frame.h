@@ -17,7 +17,7 @@ using namespace std;
 
 class stack_frame {
     ulong stack_length = 0;
-    unordered_map<string, uint64_t> addresses;
+    vector<uint64_t> addresses;
 public:
     vector<pair<stack_type, uint64_t>> stack;
     long depth;
@@ -27,8 +27,8 @@ public:
     }
     ~stack_frame();
 
-    void move_address(const string &name);
-    pair<bool, uint64_t> access_address(const string &name);
+    void move_address();
+    uint64_t access_address(ulong index);
 
     void push(stack_type type, uint64_t value);
     pair<stack_type, uint64_t> pop();
