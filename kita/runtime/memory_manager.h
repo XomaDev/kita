@@ -34,16 +34,18 @@ public:
 
     void assert_last(stack_type type);
 
-    func_obj *lookup_func(const string &name);
+    func_obj *lookup_func(pair<ulong, ulong>);
 
-    void move_address(const string &name);
+    void move_address();
 
-    pair<long, unsigned long> * access_address(const string &name);
+    uint64_t access_address(pair<ulong, ulong> address);
 
     void free_all();
 
     pair<stack_type, uint64_t> dereference(pair<stack_type, uint64_t> element);
     void relocate_last();
+
+    stack_frame *&get_frame(const pair<ulong, ulong> &address);
 };
 
 

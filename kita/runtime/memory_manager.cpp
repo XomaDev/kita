@@ -3,6 +3,7 @@
 //
 
 #include <stdexcept>
+#include <iostream>
 #include "memory_manager.h"
 
 void memory_manager::push_frame() {
@@ -18,34 +19,25 @@ void memory_manager::release_frame() {
     current_frame = frames.back();
 }
 
-void memory_manager::move_address(const string &name) {
-    return current_frame->move_address(name);
+void memory_manager::move_address() {
+    return current_frame->move_address();
 }
 
-pair<long, unsigned long>* memory_manager::access_address(const string &name) {
-    long search_depth = current_depth;
-    while (search_depth) {
-        auto frame = frames[--search_depth];
-        auto result = frame->access_address(name);
-        if (result.first) {
-            return new pair(search_depth, result.second);
-        }
-    }
-    throw runtime_error("access_address, looked in all depths, cannot find address " + name);
+uint64_t memory_manager::access_address(pair<ulong, ulong> address) {
+    return get_frame(address)->access_address(address.second);
 }
 
-func_obj* memory_manager::lookup_func(const string &name) {
-    for (long i = 0; i < current_depth; i++) {
-        auto frame = frames[i];
-        auto result = frame->access_address(name);
-        if (result.first) {
-            auto pointer = frame->stack[result.second];
-            if (pointer.first == stack_type::FUNC_PTR) {
-                return reinterpret_cast<func_obj *>(pointer.second);
-            }
-        }
+stack_frame *&memory_manager::get_frame(const pair<ulong, ulong> &address) {
+    return frames[current_depth - address.first - 1];
+}
+
+func_obj* memory_manager::lookup_func(pair<ulong, ulong> address) {
+    auto frame = frames[address.first];
+    auto pointer = frame->stack[access_address(address)];
+    if (pointer.first == stack_type::FUNC_PTR) {
+        return reinterpret_cast<func_obj *>(pointer.second);
     }
-    throw runtime_error("lookup_func, looked in all depths, cannot find function " + name);
+    throw runtime_error("lookup_func, expected FUNC_PTR, got " + to_string(static_cast<int>(pointer.first)));
 }
 
 void memory_manager::push(stack_type type, uint64_t value) {
@@ -84,10 +76,10 @@ void memory_manager::assert_last(stack_type type) {
 pair<stack_type, uint64_t> memory_manager::dereference(pair<stack_type, uint64_t> element) {
     for (;;) {
         if (element.first == stack_type::PTR) {
-            auto pair = reinterpret_cast<::pair<long, unsigned long>*>(element.second);
-            auto depth = pair->first;
-            auto stack_index = pair->second;
-            return frames[depth]->stack[stack_index];
+            auto pair = reinterpret_cast<::pair<ulong, ulong>*>(element.second);
+            auto value = get_frame(*pair)->stack[pair->second];
+            delete pair;
+            return value;
         } else {
             return element;
         }

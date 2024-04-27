@@ -15,6 +15,7 @@
 #include "../bytecode.h"
 #include "visitable.h"
 #include "memory_manager.h"
+#include "address_mapping.h"
 
 using namespace std;
 
@@ -32,6 +33,8 @@ class runtime {
 
     vector<visitable> ondemand_visitables;
     ulong ondemand_index = 0;
+
+    address_mapping addr_map;
 
     // long last_call_markup = -1;
     pair<stack_type, uint64_t> last_call_result;
