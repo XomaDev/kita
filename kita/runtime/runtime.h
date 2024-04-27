@@ -59,6 +59,7 @@ class runtime {
     visitable func_decl();
 
     visitable binary_operation();
+    visitable unary_operation();
 
     bool binary_equals();
     visitable binary_addition();

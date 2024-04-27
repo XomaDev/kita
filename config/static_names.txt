@@ -21,7 +21,7 @@ return Return
 ; Semicolon
 , Comma
 _ With
-! ConditionalMarking
+! Not:Unary
 { StartBody
 } CloseBody
 ( OpenExpr
@@ -43,4 +43,4 @@ _ With
 / Slash:BinaryPrecede:NonCommute
 * Asterisk:BinaryPrecede:NonCommute
 + Add:Binary
-- Negate:Binary
+- Negate:Binary:Unary

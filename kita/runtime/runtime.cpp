@@ -42,6 +42,8 @@ optional<visitable> runtime::encapsule_next() {
             return load();
         case bytecode::BINARY_OP:
             return binary_operation();
+        case bytecode::UNARY_OP:
+            return unary_operation();
         case bytecode::INVOKE:
             return invoke();
         case bytecode::LET:
@@ -268,6 +270,29 @@ visitable runtime::binary_operation() {
             throw runtime_error("Unknown binary operator " + to_string(binary_op));
         }
     }
+}
+
+visitable runtime::unary_operation() {
+    auto unary_operator = advance_bytecode();
+    switch (unary_operator) {
+        case bytecode::NEG: {
+            return visitable {
+                [this]() {
+                    memory.push_int(-(memory.pop_int()));
+                    return 0;
+                }
+            };
+        }
+        case bytecode::NOT: {
+            return visitable {
+                    [this]() {
+                        memory.push(stack_type::BOOL, memory.pop_int() ^ 1);
+                        return 0;
+                    }
+            };
+        }
+    }
+    throw runtime_error("Unknown unary operator " + to_string(static_cast<int>(unary_operator)));
 }
 
 bool runtime::binary_equals() {

@@ -18,11 +18,12 @@ enum class bytecode {
     // instruction types
     LOAD = 11,
     BINARY_OP = 12,
-    INVOKE = 13,
-    LET = 14,
-    IF = 15,
-    FUNC = 16,
-    RETURN = 17,
+    UNARY_OP = 13,
+    INVOKE = 14,
+    LET = 15,
+    IF = 16,
+    FUNC = 17,
+    RETURN = 18,
 
     // declaration class types
     BOOL_CLASS = 21,
@@ -46,9 +47,12 @@ enum class bytecode {
     GREATER_EQUALS = 43,
     LESSER_EQUALS = 44,
 
+    NOT = 45,
 
-    DISP = 50,
-    SCOPE = 51,
+    KITA = 51,
+
+    DISP = 61,
+    SCOPE = 62,
 };
 
 #endif //KITA_BYTECODE_H

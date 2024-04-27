@@ -42,6 +42,7 @@ class parser {
 
     unique_ptr<expr_base> parse_expr(int precedence);
 
+    unique_ptr<expr_base> unary_expression(unique_ptr<token> &uniquePtr);
     unique_ptr<expr_base> read_expr();
 
     unique_ptr<token>& strict_match(const string& type);
@@ -60,6 +61,7 @@ public:
         // constructor initialized
     }
     void parse();
+
 };
 
 

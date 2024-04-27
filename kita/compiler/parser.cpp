@@ -14,6 +14,7 @@
 #include "expr/expr_return.h"
 #include "expr/expr_class.h"
 #include "expr/expr_name.h"
+#include "expr/expr_unary.h"
 
 using namespace std;
 
@@ -216,6 +217,10 @@ int parser::operator_precedence(unique_ptr<token> &token_operator) {
     return precedence;
 }
 
+unique_ptr<expr_base> parser::unary_expression(unique_ptr<token> &uniquePtr) {
+    auto expr = parse_next();
+    return std::make_unique<expr_unary>(uniquePtr, std::move(expr));
+}
 
 unique_ptr<expr_base> parser::read_expr() {
     auto &token = next();
@@ -234,6 +239,8 @@ unique_ptr<expr_base> parser::read_expr() {
         back();
         auto inline_body = read_body();
         return inline_body;
+    } else if (token->has_type("Unary")) {
+        return unary_expression(token);
     }
     throw runtime_error("Unknown type, not handled '" + token->types_str_repr() + "'");
 }
