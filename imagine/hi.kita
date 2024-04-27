@@ -1,5 +1,8 @@
-fn Int hi: x _ y {
-    let result = x * y
-    disp "result is " _ result
+fn fib: n {
+    if (n < 2) {
+        return n
+    }
+    return fib(n - 1) + fib(n - 2)
 }
-hi(5 _ 6)
+let result = fib(10)
+disp "Result is " _ result

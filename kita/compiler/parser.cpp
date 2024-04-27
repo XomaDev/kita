@@ -78,7 +78,6 @@ unique_ptr<expr_base> parser::if_decl(unique_ptr<token>& if_token) {
 }
 
 unique_ptr<expr_func> parser::function_decl() {
-    auto ret_class = make_unique<expr_class>(peek()->first_type == "Class" ? std::move(next()) : nullptr);
     string function_name = strict_match("Identifier")->value;
 
     vector<unique_ptr<expr_base>> type_args;
@@ -104,7 +103,7 @@ unique_ptr<expr_func> parser::function_decl() {
     } else {
         func_body = read_body();
     }
-    return make_unique<expr_func>(function_name, std::move(ret_class), std::move(func_body), std::move(args_group));
+    return make_unique<expr_func>(function_name, std::move(func_body), std::move(args_group));
 }
 
 unique_ptr<expr_group> parser::read_body() {
@@ -118,8 +117,9 @@ unique_ptr<expr_group> parser::read_body() {
 }
 
 unique_ptr<expr_invoke> parser::invoke_decl(unique_ptr<token>& method_token) {
-    string method_name = method_token->value;
-    unique_ptr<expr_group> args = read_invoke_args("With");
+    auto method_name = method_token->value;
+    auto separator = next_match("OpenExpr") ? "Comma" : "With";
+    auto args = read_invoke_args(separator);
     return make_unique<expr_invoke>(method_name, std::move(args));
 }
 

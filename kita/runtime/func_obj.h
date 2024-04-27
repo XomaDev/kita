@@ -20,16 +20,15 @@ class func_obj {
     string name;
     u_int8_t args_size;
 public:
-    bytecode return_type;
     ulong visitable_index;
 
-    func_obj(string name, bytecode return_type, u_int8_t args_size, ulong visitable_index)
-                    : name(std::move(name)), return_type(return_type), args_size(args_size),
+    func_obj(string name, u_int8_t args_size, ulong visitable_index)
+                    : name(std::move(name)), args_size(args_size),
                     visitable_index(visitable_index) {
         // constructor initialized
     }
 
-    void prepare(uint8_t args, memory_manager *memory);
+    static void prepare(uint8_t args, memory_manager *memory);
 };
 
 

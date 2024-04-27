@@ -73,7 +73,6 @@ visitable runtime::return_decl() {
 
 visitable runtime::func_decl() {
     auto func_name = read_string();
-    auto return_type = advance_bytecode();
     auto args_size = static_cast<uint8_t>(advance());
 
     resolver.declare("func@" + func_name);
@@ -84,7 +83,7 @@ visitable runtime::func_decl() {
     }
     auto func_body = encapsule_scope(false);
     ondemand_visitables.emplace_back(func_body);
-    auto func = new func_obj(func_name, return_type, args_size, ondemand_index++);
+    auto func = new func_obj(func_name, args_size, ondemand_index++);
 
     return visitable {
         [func, this]() {
@@ -352,7 +351,10 @@ visitable runtime::func_invoke(int num_args) {
             auto func_body = ondemand_visitables[func_obj->visitable_index];
             auto result_code = func_body.execute();
             if (result_code == 2) {
+                // meaning something was returned
                 memory.push(last_call_result.first, last_call_result.second);
+            } else {
+                memory.push(stack_type::INT, 0);
             }
             return 0;
         }
