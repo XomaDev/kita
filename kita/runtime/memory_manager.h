@@ -34,7 +34,7 @@ public:
 
     void assert_last(stack_type type);
 
-    func_obj *lookup_func(address address);
+    ulong lookup_func(address address);
 
     void move_address();
 

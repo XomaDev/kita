@@ -8,7 +8,6 @@
 #include <optional>
 #include "runtime.h"
 #include "stack_type.h"
-#include "func_obj.h"
 #include "visitable.h"
 
 void runtime::prepare() {
@@ -85,10 +84,10 @@ visitable runtime::func_decl() {
     }
     auto func_body = encapsule_scope(false);
     ondemand_visitables.emplace_back(func_body);
-    auto func = new func_obj(func_name, ondemand_index++);
+    auto memory_address = ondemand_index++;
     return visitable {
-        [func, this]() {
-            memory.push(stack_type::FUNC_PTR, reinterpret_cast<uint64_t>(func));
+        [memory_address, this]() {
+            memory.push(stack_type::FUNC_PTR, reinterpret_cast<uint64_t>(memory_address));
             memory.move_address();
             return 0;
         }
@@ -370,10 +369,14 @@ visitable runtime::func_invoke(int num_args) {
     auto address = resolver.resolve("func@" + name, true);
     return visitable {
         [num_args, address, this]() {
-            auto func_obj = memory.lookup_func(address);
-            func_obj->prepare(num_args, &memory);
-
-            auto func_body = ondemand_visitables[func_obj->visitable_index];
+            auto visitable_index = memory.lookup_func(address);
+            memory.push_frame();
+            for (uint8_t i = 0; i < num_args; i++) {
+                // pop() from the last frame, push it to current frame
+                memory.relocate_last();
+                memory.move_address();
+            }
+            auto func_body = ondemand_visitables[visitable_index];
             auto result_code = func_body.execute();
             if (result_code == 2) {
                 // meaning something was returned
@@ -409,9 +412,6 @@ visitable runtime::if_decl() {
     return visitable {
         [has_else, if_body, else_body, this]() {
             auto eq_value = memory.pop();
-            if (eq_value.first != stack_type::BOOL) {
-                throw runtime_error("If (*non-bool*expr) found");
-            }
             if (eq_value.second) {
                 return if_body.execute();
             } else if (has_else) {

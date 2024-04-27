@@ -4,7 +4,6 @@
 
 #include <stdexcept>
 #include <iostream>
-#include "func_obj.h"
 #include "memory_manager.h"
 #include "address.h"
 
@@ -33,11 +32,11 @@ void memory_manager::access_address(address addr) {
     push(dereferenced.first, dereferenced.second);
 }
 
-func_obj* memory_manager::lookup_func(address address) {
+ulong memory_manager::lookup_func(address address) {
     auto frame = frames[address.scope];
     auto pointer = frame->stack[address.index];
     if (pointer.first == stack_type::FUNC_PTR) {
-        return reinterpret_cast<func_obj *>(pointer.second);
+        return pointer.second;
     }
     throw runtime_error("lookup_func, looked in all depths, cannot find address " + address.print());
 }
