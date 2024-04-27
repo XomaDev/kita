@@ -325,10 +325,12 @@ visitable runtime::invoke() {
         case bytecode::DISP: {
             return visitable {
                 [num_args, this]() {
-                    for (int i = 0; i < num_args; i++) {
-                        auto value = memory.pop();
-                        cout << element_to_string(value) << endl;
-                    }
+                    pair<stack_type, uint64_t> values[num_args];
+                    for (auto i = num_args - 1; i >= 0; i--)
+                        values[i] = memory.pop();
+                    for (const auto value: values)
+                        cout << element_to_string(value);
+                    cout << endl;
                     return 0;
                 }
             };
@@ -336,6 +338,68 @@ visitable runtime::invoke() {
         default: {
             throw runtime_error("Unknown method code " + to_string(method));
         }
+        case bytecode::VOID:
+            break;
+        case bytecode::BOOL_TYPE:
+            break;
+        case bytecode::INT_TYPE:
+            break;
+        case bytecode::STRING_TYPE:
+            break;
+        case bytecode::SCOPE_START:
+            break;
+        case bytecode::SCOPE_END:
+            break;
+        case bytecode::LOAD:
+            break;
+        case bytecode::BINARY_OP:
+            break;
+        case bytecode::INVOKE:
+            break;
+        case bytecode::LET:
+            break;
+        case bytecode::IF:
+            break;
+        case bytecode::FUNC:
+            break;
+        case bytecode::RETURN:
+            break;
+        case bytecode::BOOL_CLASS:
+            break;
+        case bytecode::INT_CLASS:
+            break;
+        case bytecode::STRING_CLASS:
+            break;
+        case bytecode::ADD:
+            break;
+        case bytecode::NEG:
+            break;
+        case bytecode::MUL:
+            break;
+        case bytecode::DIV:
+            break;
+        case bytecode::LOGICAL_AND:
+            break;
+        case bytecode::LOGICAL_OR:
+            break;
+        case bytecode::BITWISE_AND:
+            break;
+        case bytecode::BITWISE_OR:
+            break;
+        case bytecode::EQUALS:
+            break;
+        case bytecode::NOT_EQUALS:
+            break;
+        case bytecode::GREATER_THAN:
+            break;
+        case bytecode::LESSER_THAN:
+            break;
+        case bytecode::GREATER_EQUALS:
+            break;
+        case bytecode::LESSER_EQUALS:
+            break;
+        case bytecode::SCOPE:
+            break;
     }
 }
 
