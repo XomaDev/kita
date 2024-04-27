@@ -24,10 +24,11 @@ void memory_manager::move_address() {
     return current_frame->move_address();
 }
 
-pair<ulong, ulong>* memory_manager::access_address(address addr) {
+void memory_manager::access_address(address addr) {
     auto frame_index = addr.static_definition ? addr.scope : current_depth - addr.scope - 1;
     auto result = frames[frame_index]->access_address(addr.index);
-    return new pair(frame_index, result);
+    auto dereferenced = frames[frame_index]->stack[result];
+    push(dereferenced.first, dereferenced.second);
 }
 
 func_obj* memory_manager::lookup_func(address address) {
@@ -48,38 +49,28 @@ void memory_manager::push_int(int64_t value) {
 }
 
 int64_t memory_manager::pop_int() {
-    auto element = pop_value();
+    auto element = current_frame->pop();
     if (element.first == stack_type::BOOL || element.first == stack_type::INT) {
         return static_cast<int64_t>(element.second);
     }
     throw runtime_error("pop_int() got " + to_string(static_cast<int>(element.first)));
 }
 
-pair<stack_type, uint64_t> memory_manager::pop_value() {
-    return dereference(current_frame->pop());
+pair<stack_type, uint64_t> memory_manager::pop() {
+    return current_frame->pop();
 }
 
 void memory_manager::relocate_last() {
-    auto value = dereference(frames[current_depth - 2]->pop());
+    auto value = frames[current_depth - 2]->pop();
     push(value.first, value.second);
 }
 
 void memory_manager::assert_last(stack_type type) {
-    auto element = dereference(current_frame->peek_back());
+    auto element = current_frame->peek_back();
     if (element.first != type) {
         throw runtime_error("assert_last expected " + to_string(static_cast<int>(type)) + " but got" +
                             to_string(static_cast<int>(element.first)));
     }
-}
-
-pair<stack_type, uint64_t> memory_manager::dereference(pair<stack_type, uint64_t> element) {
-    if (element.first == stack_type::PTR) {
-        auto pair = reinterpret_cast<::pair<long, unsigned long>*>(element.second);
-        auto result = frames[pair->first]->stack[pair->second];
-        delete pair;
-        return result;
-    }
-    return element;
 }
 
 void memory_manager::free_all() {

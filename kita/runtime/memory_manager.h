@@ -30,8 +30,7 @@ public:
     void push_int(int64_t value);
 
     int64_t pop_int();
-
-    pair<stack_type, uint64_t> pop_value();
+    pair<stack_type, uint64_t> pop();
 
     void assert_last(stack_type type);
 
@@ -39,11 +38,9 @@ public:
 
     void move_address();
 
-    pair<ulong, ulong> * access_address(address address);
+    void access_address(address address);
 
     void free_all();
-
-    pair<stack_type, uint64_t> dereference(pair<stack_type, uint64_t> element);
     void relocate_last();
 };
 

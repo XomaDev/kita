@@ -64,7 +64,7 @@ visitable runtime::return_decl() {
         [result_code, this]() {
             if (result_code == 2) {
                 // something has been returned
-                last_call_result = memory.pop_value();
+                last_call_result = memory.pop();
             }
             return result_code;
         }
@@ -121,8 +121,7 @@ visitable runtime::load() {
             auto address = resolver.resolve("var@" + name, false);
             return visitable {
                 [address, this]() {
-                    auto pointer = memory.access_address(address);
-                    memory.push(stack_type::PTR, reinterpret_cast<uint64_t>(pointer));
+                    memory.access_address(address);
                     return 0;
                 }
             };
@@ -274,7 +273,7 @@ visitable runtime::binary_operation() {
 }
 
 bool runtime::binary_equals() {
-    auto r = memory.pop_value(), l = memory.pop_value();
+    auto r = memory.pop(), l = memory.pop();
     if (r.first != l.first) {
         // false if not same type
         return false;
@@ -296,7 +295,7 @@ visitable runtime::binary_addition() {
     return visitable {
         [this]() {
             // not just limited to Int + Int, includes String too
-            auto right = memory.pop_value(), left = memory.pop_value();
+            auto right = memory.pop(), left = memory.pop();
             if (left.first == stack_type::INT && right.first == stack_type::INT) {
                 memory.push_int(static_cast<int64_t>(left.second) + static_cast<int>(right.second));
                 return 0;
@@ -327,7 +326,7 @@ visitable runtime::invoke() {
             return visitable {
                 [num_args, this]() {
                     for (int i = 0; i < num_args; i++) {
-                        auto value = memory.pop_value();
+                        auto value = memory.pop();
                         cout << element_to_string(value) << endl;
                     }
                     return 0;
@@ -401,7 +400,7 @@ visitable runtime::if_decl() {
     }
     return visitable {
         [has_else, if_body, else_body, this]() {
-            auto eq_value = memory.pop_value();
+            auto eq_value = memory.pop();
             if (eq_value.first != stack_type::BOOL) {
                 throw runtime_error("If (*non-bool*expr) found");
             }
