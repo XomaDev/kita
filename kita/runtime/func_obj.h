@@ -18,13 +18,10 @@ class visitable;
 
 class func_obj {
     string name;
-    u_int8_t args_size;
 public:
     ulong visitable_index;
 
-    func_obj(string name, u_int8_t args_size, ulong visitable_index)
-                    : name(std::move(name)), args_size(args_size),
-                    visitable_index(visitable_index) {
+    func_obj(string name, ulong visitable_index): name(std::move(name)), visitable_index(visitable_index) {
         // constructor initialized
     }
 

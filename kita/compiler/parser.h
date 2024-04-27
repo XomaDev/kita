@@ -28,7 +28,9 @@ class parser {
 
     unique_ptr<expr_base> if_decl(unique_ptr<token>& if_token);
 
-    unique_ptr<expr_func> function_decl();
+    unique_ptr<expr_func> func_decl();
+    void func_arg_names(vector<unique_ptr<expr_base>> &type_args);
+    unique_ptr<expr_base> identifier();
 
     unique_ptr<expr_invoke> invoke_decl(unique_ptr<token>& ptr);
 

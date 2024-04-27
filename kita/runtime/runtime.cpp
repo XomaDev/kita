@@ -83,8 +83,7 @@ visitable runtime::func_decl() {
     }
     auto func_body = encapsule_scope(false);
     ondemand_visitables.emplace_back(func_body);
-    auto func = new func_obj(func_name, args_size, ondemand_index++);
-
+    auto func = new func_obj(func_name, ondemand_index++);
     return visitable {
         [func, this]() {
             memory.push(stack_type::FUNC_PTR, reinterpret_cast<uint64_t>(func));

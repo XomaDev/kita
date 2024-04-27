@@ -17,15 +17,17 @@ using namespace std;
 
 class expr_func : public expr_base {
     string func_name;
+    bool inline_declaration;
     unique_ptr<expr_group> func_body;
     unique_ptr<expr_group> type_args;
 
 public:
-    explicit expr_func(string func_name, unique_ptr<expr_group> func_body, unique_ptr<expr_group> type_args)
-            : func_name(std::move(func_name)), func_body(std::move(func_body)), type_args(std::move(type_args)) {
+    explicit expr_func(string func_name, bool inline_declaration, unique_ptr<expr_group> func_body, unique_ptr<expr_group> type_args)
+            : func_name(std::move(func_name)), inline_declaration(inline_declaration), func_body(std::move(func_body)),
+            type_args(std::move(type_args)) {
         set_display(
-                "func{name=" + this->func_name +", args=" + this->type_args->to_string()
-                + ", body=" + this->func_body->to_string() + "}"
+                "func{name=" + this->func_name + ", inline=" + std::to_string(inline_declaration)
+                + ", args=" + this->type_args->to_string() + ", body=" + this->func_body->to_string() + "}"
         );
     }
 
@@ -41,6 +43,10 @@ public:
         // write the size of the scope
         pDump->write(bytecode::SCOPE_START);
         func_body->dump(pDump);
+        if (inline_declaration) {
+            pDump->write(bytecode::RETURN);
+            pDump->write_uint8(0);
+        }
         pDump->write(bytecode::SCOPE_END);
     }
 

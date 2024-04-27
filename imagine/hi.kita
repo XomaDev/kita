@@ -1,8 +1,2 @@
-fn fib: n {
-    if (n < 2) {
-        return n
-    }
-    return fib(n - 1) + fib(n - 2)
-}
-let result = fib(10)
-disp "Result is " _ result
+fn hi(n) = n * 2
+disp hi(10)

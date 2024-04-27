@@ -34,7 +34,7 @@ unique_ptr<expr_base> parser::parse_next() {
         } else if (token->has_type("Method")) {
             return invoke_decl(token);
         } else if (token->has_type("Function")) {
-            return function_decl();
+            return func_decl();
         } else if (token->first_type == "Return") {
             return make_unique<expr_return>(std::move(parse_next()));
         }
@@ -77,33 +77,44 @@ unique_ptr<expr_base> parser::if_decl(unique_ptr<token>& if_token) {
     }
 }
 
-unique_ptr<expr_func> parser::function_decl() {
+unique_ptr<expr_func> parser::func_decl() {
     string function_name = strict_match("Identifier")->value;
 
     vector<unique_ptr<expr_base>> type_args;
-    if (peek()->has_type("Colon")) {
+    auto &peek_token = peek();
+    if (peek_token->first_type == "Colon") {
         skip(); // eat ':'
         // read function parameter names seperated by _
-        type_args.emplace_back(std::make_unique<expr_name>(std::move(strict_match("Identifier"))));
-        while (!isEOF() && peek()->first_type == "With") {
-            skip(); // eat '_'
-            type_args.emplace_back(std::make_unique<expr_name>(std::move(strict_match("Identifier"))));
-        }
+        func_arg_names(type_args);
+    } else if (peek_token->first_type == "OpenExpr") {
+        skip(); // just another way to write func args :)
+        func_arg_names(type_args);
+        strict_match("CloseExpr");
     }
     auto args_group = make_unique<expr_group>(std::move(type_args));
 
-    bool inline_expr = false;
+    bool inline_declaration = false;
     unique_ptr<expr_group> func_body;
     if (next_match("Assignment")) {
-        throw runtime_error("Inline not yet supported");
-        // inline return expression assignment
         skip();
         func_body = expr_group::singleton(parse_next());
-        inline_expr = true;
+        inline_declaration = true;
     } else {
         func_body = read_body();
     }
-    return make_unique<expr_func>(function_name, std::move(func_body), std::move(args_group));
+    return make_unique<expr_func>(function_name, inline_declaration, std::move(func_body), std::move(args_group));
+}
+
+void parser::func_arg_names(vector<unique_ptr<expr_base>> &type_args) {
+    type_args.emplace_back(identifier());
+    while (!isEOF() && peek()->first_type == "With") {
+        skip(); // eat '_'
+        type_args.emplace_back(identifier());
+    }
+}
+
+unique_ptr<expr_base> parser::identifier() {
+    return make_unique<expr_name>(std::move(strict_match("Identifier")));
 }
 
 unique_ptr<expr_group> parser::read_body() {
