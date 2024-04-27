@@ -22,8 +22,9 @@ enum class bytecode {
     INVOKE = 14,
     LET = 15,
     IF = 16,
-    FUNC = 17,
-    RETURN = 18,
+    INLINE_IF = 17,
+    FUNC = 18,
+    RETURN = 19,
 
     // declaration class types
     BOOL_CLASS = 21,

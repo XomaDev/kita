@@ -49,6 +49,8 @@ optional<visitable> runtime::encapsule_next() {
             return let();
         case bytecode::IF:
             return if_decl();
+        case bytecode::INLINE_IF:
+            return inline_if_decl();
         case bytecode::RETURN:
             return return_decl();
         case bytecode::FUNC:
@@ -382,6 +384,7 @@ visitable runtime::func_invoke(int num_args) {
                 // meaning something was returned
                 memory.push(last_call_result.first, last_call_result.second);
             } else {
+                cout << "Fill 0" << endl;
                 memory.push(stack_type::INT, 0);
             }
             return 0;
@@ -411,8 +414,8 @@ visitable runtime::if_decl() {
     }
     return visitable {
         [has_else, if_body, else_body, this]() {
-            auto eq_value = memory.pop();
-            if (eq_value.second) {
+            auto eq_value = memory.pop_int();
+            if (eq_value) {
                 return if_body.execute();
             } else if (has_else) {
                 return else_body.execute();
@@ -422,12 +425,48 @@ visitable runtime::if_decl() {
     };
 }
 
+visitable runtime::inline_if_decl() {
+    auto if_expr = encapsule_set();
+    auto else_expr = encapsule_set();
+    return visitable {
+        [if_expr, else_expr, this]() {
+            auto eq_value = memory.pop_int();
+            return execute_set(eq_value ? if_expr : else_expr);
+        }
+    };
+}
+
 visitable runtime::encapsule_scope(bool push_frame) {
-    vector<visitable> local_instructions;
-    expect(bytecode::SCOPE_START);
     if (push_frame) {
         resolver.enter_frame();
     }
+    vector<visitable> local_instructions = encapsule_set();
+    resolver.exit_fame();
+    return visitable {
+        [push_frame, local_instructions, this]() {
+            if (push_frame) {
+                memory.push_frame();
+            }
+            auto result_code = execute_set(local_instructions);
+            memory.release_frame();
+            return result_code;
+        }
+    };
+}
+
+int runtime::execute_set(const vector<visitable>& local_instructions) {
+    for (const auto& instruction : local_instructions) {
+        auto code = instruction.execute();
+        if (code != 0) {
+            return code;
+        }
+    }
+    return 0;
+}
+
+vector<visitable> runtime::encapsule_set() {
+    vector<visitable> local_instructions;
+    expect(bytecode::SCOPE_START);
     for (;;) {
         auto next = encapsule_next();
         if (next) {
@@ -438,24 +477,7 @@ visitable runtime::encapsule_scope(bool push_frame) {
             break;
         }
     }
-    resolver.exit_fame();
-    return visitable {
-        [push_frame, local_instructions, this]() {
-            if (push_frame) {
-                memory.push_frame();
-            }
-            auto result_code = 0;
-            for (const auto& instruction : local_instructions) {
-                auto code = instruction.execute();
-                if (code != 0) {
-                    result_code = code;
-                    break;
-                }
-            }
-            memory.release_frame();
-            return result_code;
-        }
-    };
+    return local_instructions;
 }
 
 bool runtime::isEOF() const {

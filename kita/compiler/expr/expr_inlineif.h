@@ -25,6 +25,23 @@ public:
                 ", if=" + this->if_expr->to_string() + ", else=" + this->else_expr->to_string()
                 );
     }
+
+    void dump(class dump *pDump) override {
+        logical_exprs->dump(pDump);
+        pDump->write(bytecode::INLINE_IF);
+
+        pDump->write(bytecode::SCOPE_START);
+        if_expr->dump(pDump);
+        pDump->write(bytecode::SCOPE_END);
+
+        pDump->write(bytecode::SCOPE_START);
+        else_expr->dump(pDump);
+        pDump->write(bytecode::SCOPE_END);
+    }
+
+    bool is_leaf() override {
+        return false;
+    }
 };
 
 

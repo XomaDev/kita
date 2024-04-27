@@ -72,8 +72,13 @@ class runtime {
     visitable let();
 
     visitable if_decl();
+    visitable inline_if_decl();
 
     visitable encapsule_scope(bool push_frame);
+    vector<visitable> encapsule_set();
+
+    static int execute_set(const vector<visitable>& local_instructions) ;
+
     void free_memory();
 public:
     runtime(unique_ptr<uchar[]> bytes, long length) : bytes(std::move(bytes)), length(length) {
