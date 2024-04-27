@@ -39,4 +39,5 @@ add_executable(kita main.cpp
         runtime/name_resolver.cpp
         runtime/name_resolver.h
         runtime/address.h
+        compiler/expr/expr_let.h
 )

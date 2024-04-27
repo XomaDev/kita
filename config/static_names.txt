@@ -4,6 +4,7 @@ Void Class:Void:Value
 Int Class:Int
 Bool Class:Bool
 String Class:String
+let Let
 disp Display:Method
 if If:IfConditional
 ifall IfAll:IfConditional

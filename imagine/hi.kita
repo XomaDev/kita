@@ -4,6 +4,6 @@ fn Int fib: n {
     }
     return fib(n - 1) + fib(n - 2)
 }
-Int~fibNumber: 25
-Int~fibResult: fib(fibNumber)
+let fibNumber = 25
+let fibResult = fib(fibNumber)
 disp "Fib Result: " + fibResult

@@ -68,7 +68,7 @@ class runtime {
     visitable invoke();
     visitable func_invoke(int i);
 
-    visitable declare();
+    visitable let();
 
     visitable if_decl();
 
@@ -82,6 +82,7 @@ public:
     void prepare();
 
     void run();
+
 };
 
 

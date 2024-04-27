@@ -10,7 +10,6 @@
 #include <utility>
 #include <vector>
 #include <memory>
-#include "expr_type.h"
 #include "expr_group.h"
 #include "expr_class.h"
 

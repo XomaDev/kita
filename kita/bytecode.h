@@ -19,7 +19,7 @@ enum class bytecode {
     LOAD = 11,
     BINARY_OP = 12,
     INVOKE = 13,
-    DECLARE = 14,
+    LET = 14,
     IF = 15,
     FUNC = 16,
     RETURN = 17,

@@ -44,8 +44,8 @@ optional<visitable> runtime::encapsule_next() {
             return binary_operation();
         case bytecode::INVOKE:
             return invoke();
-        case bytecode::DECLARE:
-            return declare();
+        case bytecode::LET:
+            return let();
         case bytecode::IF:
             return if_decl();
         case bytecode::RETURN:
@@ -357,32 +357,11 @@ visitable runtime::func_invoke(int num_args) {
     };
 }
 
-visitable runtime::declare() {
-    int class_type = advance();
-    string name = read_string();
-
-    stack_type type;
-    switch (static_cast<bytecode>(class_type)) {
-        case bytecode::BOOL_CLASS: {
-            type = stack_type::BOOL;
-            break;
-        }
-        case bytecode::INT_CLASS: {
-            type = stack_type::INT;
-            break;
-        }
-        case bytecode::STRING_CLASS: {
-            type = stack_type::STRING;
-            break;
-        }
-        default: {
-            throw runtime_error("Unknown class type " + to_string(class_type));
-        }
-    }
+visitable runtime::let() {
+    auto name = read_string();
     resolver.declare("var@" + name);
     return visitable {
-        [type, this]() {
-            memory.assert_last(type);
+        [this]() {
             memory.move_address();
             return 0;
         }

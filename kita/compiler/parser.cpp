@@ -7,7 +7,6 @@
 #include "expr/expr_base.h"
 #include "expr/expr_token.h"
 #include "expr/expr_binary.h"
-#include "expr/expr_type.h"
 #include "expr/expr_invoke.h"
 #include "expr/expr_func.h"
 #include "expr/expr_if.h"
@@ -28,8 +27,8 @@ void parser::parse() {
 unique_ptr<expr_base> parser::parse_next() {
     auto &token = next();
     if (!isEOF()) {
-        if (token->has_type("Class") && next_match("Kita")) {
-            return type_decl(token, false);
+        if (token->first_type == "Let") {
+            return let_decl();
         } else if (token->has_type("IfConditional")) {
             return if_decl(token);
         } else if (token->has_type("Method")) {
@@ -157,18 +156,11 @@ unique_ptr<expr_group> parser::multi_expr_read(const string& type_delimiter) {
     return make_unique<expr_group>(std::move(args));
 }
 
-unique_ptr<expr_type> parser::type_decl(unique_ptr<token>& class_token, bool simple) {
-    strict_match("Kita");
-
-    string class_name = class_token->value;
-    string decl_name = strict_match("Identifier")->value;
-
-    if (!simple && next_match("Colon")) {
-        // variable declaration
-        skip();
-        return make_unique<expr_type>(class_name, decl_name, std::move(parse_next()));
-    }
-    return make_unique<expr_type>(class_name, decl_name, nullptr);
+unique_ptr<expr_let> parser::let_decl() {
+    auto name = strict_match("Identifier")->value;
+    strict_match("Assignment");
+    auto expr = parse_next();
+    return make_unique<expr_let>(name, std::move(expr));
 }
 
 unique_ptr<expr_base> parser::parse_expr(int minPrecedence) {
