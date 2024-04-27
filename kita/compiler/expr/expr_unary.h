@@ -29,10 +29,6 @@ public:
             throw runtime_error("Unknown unary operator " + _operator->to_string());
         }
     }
-
-    bool is_leaf() override {
-        return false;
-    }
 };
 
 #endif //KITA_EXPR_UNARY_H

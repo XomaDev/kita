@@ -30,10 +30,6 @@ public:
             throw runtime_error("Unknown token " + token_class->to_string());
         }
     }
-
-    bool is_leaf() override {
-        return false; // dosent matter
-    }
 };
 
 #endif //KITA_EXPR_CLASS_H

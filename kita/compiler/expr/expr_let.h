@@ -22,10 +22,6 @@ public:
         pDump->write_name(name);
     }
 
-    bool is_leaf() override {
-        return false;
-    }
-
 private:
     const string name;
     unique_ptr<expr_base> expr;

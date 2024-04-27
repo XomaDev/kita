@@ -61,10 +61,6 @@ public:
             throw runtime_error("Unknown operator " + _operator->to_string());
         }
     }
-
-    bool is_leaf() override {
-        return false;
-    }
 };
 
 #endif //KITA_EXPR_BINARY_H

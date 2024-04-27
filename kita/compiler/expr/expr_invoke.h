@@ -41,10 +41,6 @@ public:
             pDump->write_name(method_name);
         }
     }
-
-    bool is_leaf() override {
-        return false;
-    }
 };
 
 

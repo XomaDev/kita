@@ -22,10 +22,6 @@ public:
     void dump(class dump *pDump) override {
         pDump->write_name(_token->value);
     }
-
-    bool is_leaf() override {
-        return true;
-    }
 };
 
 

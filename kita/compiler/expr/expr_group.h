@@ -42,10 +42,6 @@ public:
             expr->dump(pDump);
         }
     }
-
-    bool is_leaf() override {
-        return false;
-    }
 };
 
 #endif

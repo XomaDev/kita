@@ -26,9 +26,6 @@ public:
         pDump->write_uint8(is_void);
     }
 
-    bool is_leaf() override {
-        return false;
-    }
 };
 
 #endif //KITA_EXPR_RETURN_H

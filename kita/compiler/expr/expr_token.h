@@ -37,10 +37,6 @@ public:
             throw runtime_error("Unknown token type " + _token->to_string());
         }
     }
-
-    bool is_leaf() override {
-        return true;
-    }
 };
 
 

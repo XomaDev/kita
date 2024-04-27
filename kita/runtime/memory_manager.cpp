@@ -80,9 +80,6 @@ void memory_manager::free_frame_content(stack_frame *pFrame) {
         if (popped.first == stack_type::STRING) {
             auto chars = reinterpret_cast<const char*>(popped.second);
             delete[] chars;
-        } else if (popped.first == stack_type::FUNC_PTR) {
-            auto func_object = reinterpret_cast<class func_obj*>(popped.second);
-            delete func_object;
         }
     }
 }

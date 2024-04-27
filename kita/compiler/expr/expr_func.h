@@ -49,10 +49,6 @@ public:
         }
         pDump->write(bytecode::SCOPE_END);
     }
-
-    bool is_leaf() override {
-        return false;
-    }
 };
 
 
