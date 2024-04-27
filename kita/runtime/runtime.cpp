@@ -309,7 +309,7 @@ string runtime::element_to_string(pair<stack_type, uint64_t> element) {
     if (element.first == stack_type::STRING) {
         return { reinterpret_cast<const char*>(element.second) };
     } else if (element.first == stack_type::BOOL || element.first == stack_type::INT) {
-        return to_string(element.second);
+        return to_string(static_cast<int64_t>(element.second));
     }
     throw runtime_error("Unknown left operand type " + to_string(static_cast<int>(element.first)));
 }
@@ -323,9 +323,10 @@ visitable runtime::invoke() {
         case bytecode::DISP: {
             return visitable {
                 [num_args, this]() {
-                    pair<stack_type, uint64_t> values[num_args];
-                    for (auto i = num_args - 1; i >= 0; i--)
+                    pair<stack_type, int64_t> values[num_args];
+                    for (auto i = num_args - 1; i >= 0; i--) {
                         values[i] = memory.pop();
+                    }
                     for (const auto value: values)
                         cout << element_to_string(value);
                     cout << endl;

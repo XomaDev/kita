@@ -1,2 +1,2 @@
-fn hi(n) = n * 2
-disp hi(10)
+let a = 1 - 2
+disp "A is " _ a
