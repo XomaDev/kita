@@ -4,6 +4,7 @@
 
 #include <stdexcept>
 #include <iostream>
+#include "func_obj.h"
 #include "memory_manager.h"
 #include "address.h"
 
@@ -14,6 +15,7 @@ void memory_manager::push_frame() {
 
 void memory_manager::release_frame() {
     auto frame = frames.back();
+    free_frame_content(frame);
     delete frame;
     frames.pop_back();
     current_depth--;
@@ -70,6 +72,19 @@ void memory_manager::assert_last(stack_type type) {
     if (element.first != type) {
         throw runtime_error("assert_last expected " + to_string(static_cast<int>(type)) + " but got" +
                             to_string(static_cast<int>(element.first)));
+    }
+}
+
+void memory_manager::free_frame_content(stack_frame *pFrame) {
+    while (pFrame->stack_length) {
+        auto popped = pFrame->stack[--pFrame->stack_length];
+        if (popped.first == stack_type::STRING) {
+            auto chars = reinterpret_cast<const char*>(popped.second);
+            delete[] chars;
+        } else if (popped.first == stack_type::FUNC_PTR) {
+            auto func_object = reinterpret_cast<class func_obj*>(popped.second);
+            delete func_object;
+        }
     }
 }
 

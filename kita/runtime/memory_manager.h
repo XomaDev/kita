@@ -42,6 +42,8 @@ public:
 
     void free_all();
     void relocate_last();
+
+    static void free_frame_content(stack_frame *pFrame);
 };
 
 

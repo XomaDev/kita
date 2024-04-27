@@ -29,16 +29,3 @@ pair<stack_type, uint64_t> stack_frame::pop() {
 pair<stack_type, uint64_t> stack_frame::peek_back() {
     return stack.back();
 }
-
-stack_frame::~stack_frame() {
-    while (stack_length) {
-        auto popped = stack[--stack_length];
-        if (popped.first == stack_type::STRING) {
-            auto chars = reinterpret_cast<const char*>(popped.second);
-            delete[] chars;
-        } else if (popped.first == stack_type::FUNC_PTR) {
-            auto func_object = reinterpret_cast<class func_obj*>(popped.second);
-            delete func_object;
-        }
-    }
-}
