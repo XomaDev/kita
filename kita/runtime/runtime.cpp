@@ -417,7 +417,6 @@ visitable runtime::if_decl() {
 visitable runtime::encapsule_scope(bool push_frame) {
     vector<visitable> local_instructions;
     expect(bytecode::SCOPE_START);
-    index += 4; // skip scope length headers
     if (push_frame) {
         resolver.enter_frame();
     }
