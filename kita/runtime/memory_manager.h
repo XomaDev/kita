@@ -6,6 +6,7 @@
 #define KITA_MEMORY_MANAGER_H
 
 #include <cstdint>
+#include <stack>
 #include "stack_frame.h"
 #include "address.h"
 
@@ -15,6 +16,8 @@ class stack_frame;
 class func_obj;
 
 class memory_manager {
+    stack<stack_frame *> frames_pool;
+
     vector<stack_frame *> frames;
     stack_frame* current_frame;
 
@@ -31,8 +34,6 @@ public:
 
     int64_t pop_int();
     pair<stack_type, uint64_t> pop();
-
-    void assert_last(stack_type type);
 
     ulong lookup_func(address address);
 

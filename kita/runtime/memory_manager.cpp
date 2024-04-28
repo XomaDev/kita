@@ -3,19 +3,26 @@
 //
 
 #include <stdexcept>
-#include <iostream>
 #include "memory_manager.h"
 #include "address.h"
 
 void memory_manager::push_frame() {
-    current_frame = new stack_frame(current_depth++);
+    if (frames_pool.empty()) {
+        current_frame = new stack_frame();
+    } else {
+        current_frame = frames_pool.top();
+        frames_pool.pop();
+    }
     frames.emplace_back(current_frame);
+    current_depth++;
 }
 
 void memory_manager::release_frame() {
     auto frame = frames.back();
     free_frame_content(frame);
-    delete frame;
+
+    // reuse the object later
+    frames_pool.push(frame);
     frames.pop_back();
     current_depth--;
     current_frame = frames.back();
@@ -66,14 +73,6 @@ void memory_manager::relocate_last() {
     push(value.first, value.second);
 }
 
-void memory_manager::assert_last(stack_type type) {
-    auto element = current_frame->peek_back();
-    if (element.first != type) {
-        throw runtime_error("assert_last expected " + to_string(static_cast<int>(type)) + " but got" +
-                            to_string(static_cast<int>(element.first)));
-    }
-}
-
 void memory_manager::free_frame_content(stack_frame *pFrame) {
     while (pFrame->stack_length) {
         auto popped = pFrame->stack[--pFrame->stack_length];
@@ -82,6 +81,8 @@ void memory_manager::free_frame_content(stack_frame *pFrame) {
             delete[] chars;
         }
     }
+    pFrame->addresses.clear();
+    pFrame->stack.clear();
 }
 
 void memory_manager::free_all() {

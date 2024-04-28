@@ -14,14 +14,10 @@
 using namespace std;
 
 class stack_frame {
-    vector<uint64_t> addresses;
 public:
+    vector<uint64_t> addresses;
     vector<pair<stack_type, uint64_t>> stack;
-    long depth;
 
-    explicit stack_frame(long depth) : depth(depth) {
-        // constructor initialized
-    }
 
     void move_address();
     uint64_t access_address(ulong index);

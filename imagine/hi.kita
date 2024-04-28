@@ -3,4 +3,5 @@ fn fib: n {
         if (n < 2) n
         else fib(n - 1) + fib(n - 2)
 }
-disp fib(25)
+let result = fib(25)
+disp "result of fib " _ result
