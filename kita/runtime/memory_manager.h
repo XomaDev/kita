@@ -14,7 +14,6 @@
 using namespace std;
 
 class stack_frame;
-class func_obj;
 
 class memory_manager {
     stack<stack_frame *> frames_pool;
@@ -49,8 +48,6 @@ public:
     void relocate_last();
 
     static void free_frame_content(stack_frame *pFrame);
-
-    static bool int_operable(const pair<stack_type, uint64_t> &element) ;
 };
 
 
