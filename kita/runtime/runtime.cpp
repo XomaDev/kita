@@ -8,7 +8,7 @@
 #include <optional>
 #include "runtime.h"
 #include "stack_type.h"
-#include "visitable.h"
+#include "structs/visitable.h"
 
 void runtime::prepare() {
     while (!isEOF()) {
@@ -103,7 +103,7 @@ visitable runtime::load() {
             bool value = advance() == 1;
             return visitable {
                 [value, this]() {
-                    memory.push(stack_type::BOOL, value);
+                    memory.push(stack_type::INT, value);
                     return 0;
                 }
             };
@@ -155,8 +155,8 @@ visitable runtime::binary_operation() {
         case bytecode::NEG: {
             return visitable {
                 [this]() {
-                    auto r = memory.pop_int(), l = memory.pop_int();
-                    memory.push_int(l - r);
+                    auto values = memory.binary_lookup();
+                    memory.binary_set(values.left - values.right);
                     return 0;
                 }
             };
@@ -164,8 +164,8 @@ visitable runtime::binary_operation() {
         case bytecode::MUL: {
             return visitable {
                 [this]() {
-                    auto r = memory.pop_int(), l = memory.pop_int();
-                    memory.push_int(l * r);
+                    auto values = memory.binary_lookup();
+                    memory.binary_set(values.left * values.right);
                     return 0;
                 }
             };
@@ -173,8 +173,8 @@ visitable runtime::binary_operation() {
         case bytecode::DIV: {
             return visitable {
                 [this]() {
-                    auto r = memory.pop_int(), l = memory.pop_int();
-                    memory.push_int(l / r);
+                    auto values = memory.binary_lookup();
+                    memory.binary_set(values.left / values.right);
                     return 0;
                 }
             };
@@ -182,8 +182,8 @@ visitable runtime::binary_operation() {
         case bytecode::BITWISE_AND: {
             return visitable {
                 [this]() {
-                    auto r = memory.pop_int(), l = memory.pop_int();
-                    memory.push_int(l & r);
+                    auto values = memory.binary_lookup();
+                    memory.binary_set(values.left & values.right);
                     return 0;
                 }
             };
@@ -191,8 +191,8 @@ visitable runtime::binary_operation() {
         case bytecode::BITWISE_OR: {
             return visitable {
                 [this]() {
-                    auto r = memory.pop_int(), l = memory.pop_int();
-                    memory.push_int(l | r);
+                    auto values = memory.binary_lookup();
+                    memory.binary_set(values.left | values.right);
                     return 0;
                 }
             };
@@ -200,8 +200,8 @@ visitable runtime::binary_operation() {
         case bytecode::LOGICAL_AND: {
             return visitable {
                 [this]() {
-                    auto r = memory.pop_int(), l = memory.pop_int();
-                    memory.push(stack_type::BOOL, l && r);
+                    auto values = memory.binary_lookup();
+                    memory.binary_set(values.left && values.right);
                     return 0;
                 }
             };
@@ -209,8 +209,8 @@ visitable runtime::binary_operation() {
         case bytecode::LOGICAL_OR: {
             return visitable {
                 [this]() {
-                    auto r = memory.pop_int(), l = memory.pop_int();
-                    memory.push(stack_type::BOOL, l || r);
+                    auto values = memory.binary_lookup();
+                    memory.binary_set(values.left || values.right);
                     return 0;
                 }
             };
@@ -218,7 +218,7 @@ visitable runtime::binary_operation() {
         case bytecode::EQUALS: {
             return visitable {
                 [this]() {
-                    memory.push(stack_type::BOOL, binary_equals());
+                    memory.push(stack_type::INT, binary_equals());
                     return 0;
                 }
             };
@@ -226,7 +226,7 @@ visitable runtime::binary_operation() {
         case bytecode::NOT_EQUALS: {
             return visitable {
                 [this]() {
-                    memory.push(stack_type::BOOL, !binary_equals());
+                    memory.push(stack_type::INT, !binary_equals());
                     return 0;
                 }
             };
@@ -234,8 +234,8 @@ visitable runtime::binary_operation() {
         case bytecode::GREATER_THAN: {
             return visitable {
                 [this]() {
-                    auto r = memory.pop_int(), l = memory.pop_int();
-                    memory.push(stack_type::BOOL, l > r);
+                    auto values = memory.binary_lookup();
+                    memory.binary_set( values.left > values.right);
                     return 0;
                 }
             };
@@ -243,8 +243,8 @@ visitable runtime::binary_operation() {
         case bytecode::LESSER_THAN: {
             return visitable {
                 [this]() {
-                    auto r = memory.pop_int(), l = memory.pop_int();
-                    memory.push(stack_type::BOOL, l < r);
+                    auto values = memory.binary_lookup();
+                    memory.binary_set(values.left < values.right);
                     return 0;
                 }
             };
@@ -252,8 +252,8 @@ visitable runtime::binary_operation() {
         case bytecode::GREATER_EQUALS: {
             return visitable {
                 [this]() {
-                    auto r = memory.pop_int(), l = memory.pop_int();
-                    memory.push(stack_type::BOOL, l >= r);
+                    auto values = memory.binary_lookup();
+                    memory.binary_set(values.left >= values.right);
                     return 0;
                 }
             };
@@ -261,8 +261,8 @@ visitable runtime::binary_operation() {
         case bytecode::LESSER_EQUALS: {
             return visitable {
                 [this]() {
-                    auto r = memory.pop_int(), l = memory.pop_int();
-                    memory.push(stack_type::BOOL, l <= r);
+                    auto values = memory.binary_lookup();
+                    memory.binary_set(values.left <= values.right);
                     return 0;
                 }
             };
@@ -287,7 +287,7 @@ visitable runtime::unary_operation() {
         case bytecode::NOT: {
             return visitable {
                     [this]() {
-                        memory.push(stack_type::BOOL, memory.pop_int() ^ 1);
+                        memory.push(stack_type::INT, memory.pop_int() ^ 1);
                         return 0;
                     }
             };
@@ -334,7 +334,7 @@ visitable runtime::binary_addition() {
 string runtime::element_to_string(pair<stack_type, uint64_t> element) {
     if (element.first == stack_type::STRING) {
         return { reinterpret_cast<const char*>(element.second) };
-    } else if (element.first == stack_type::BOOL || element.first == stack_type::INT) {
+    } else if (element.first == stack_type::INT) {
         return to_string(static_cast<int64_t>(element.second));
     }
     throw runtime_error("Unknown left operand type " + to_string(static_cast<int>(element.first)));

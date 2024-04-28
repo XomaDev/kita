@@ -31,11 +31,12 @@ add_executable(kita main.cpp
         runtime/stack_frame.h
         runtime/memory_manager.cpp
         runtime/memory_manager.h
-        runtime/visitable.h
+        runtime/structs/visitable.h
         compiler/expr/expr_name.h
         runtime/name_resolver.cpp
         runtime/name_resolver.h
         runtime/address.h
         compiler/expr/expr_let.h
         compiler/expr/expr_unary.h
+        runtime/structs/binary_value.h
 )

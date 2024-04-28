@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include "memory_manager.h"
 #include "address.h"
+#include "structs/binary_value.h"
 
 void memory_manager::push_frame() {
     if (frames_pool.empty()) {
@@ -58,10 +59,28 @@ void memory_manager::push_int(int64_t value) {
 
 int64_t memory_manager::pop_int() {
     auto element = current_frame->pop();
-    if (element.first == stack_type::BOOL || element.first == stack_type::INT) {
+    if (element.first == stack_type::INT) {
         return static_cast<int64_t>(element.second);
     }
     throw runtime_error("pop_int() got " + to_string(static_cast<int>(element.first)));
+}
+
+binary_value memory_manager::binary_lookup() {
+    // retrieve last two values, without popping
+    auto right = current_frame->stack[current_frame->stack_length - 1];
+    auto left = current_frame->stack[current_frame->stack_length - 2];
+    if (right.first == stack_type::INT && left.first == stack_type::INT) {
+        return { static_cast<int64_t>(left.second), static_cast<int64_t>(right.second)};
+    }
+    throw runtime_error("Did not get expected two int pairs");
+}
+
+
+void memory_manager::binary_set(uint64_t value) {
+    // set stack[stack_size - 2] = value
+    // then pop() last value
+    current_frame->stack[current_frame->stack_length - 2] = { stack_type::INT, value };
+    current_frame->pop();
 }
 
 pair<stack_type, uint64_t> memory_manager::pop() {

@@ -6,11 +6,9 @@
 #define KITA_STACK_TYPE_H
 
 enum class stack_type {
-    BOOL = 0,
-    INT = 1,
+    INT = 0,
     STRING = 2,
 
-    PTR = 20,
     FUNC_PTR = 21,
 };
 

@@ -13,7 +13,7 @@
 #include <optional>
 #include "stack_type.h"
 #include "../bytecode.h"
-#include "visitable.h"
+#include "structs/visitable.h"
 #include "memory_manager.h"
 #include "name_resolver.h"
 

@@ -6,7 +6,7 @@
 #define KITA_VISITABLE_H
 
 #include <functional>
-#include "runtime.h"
+#include "../runtime.h"
 
 using namespace std;
 

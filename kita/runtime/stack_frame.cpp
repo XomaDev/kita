@@ -21,3 +21,7 @@ pair<stack_type, uint64_t> stack_frame::pop() {
     stack_length--;
     return element;
 }
+
+pair<pair<stack_type, uint64_t>, pair<stack_type, uint64_t>> stack_frame::smart_lookup() {
+    return { stack[stack_length - 1], stack[stack_length - 2] };
+}

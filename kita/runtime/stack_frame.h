@@ -24,6 +24,8 @@ public:
     pair<stack_type, uint64_t> pop();
 
     ulong stack_length = 0;
+
+    pair<pair<stack_type, uint64_t>, pair<stack_type, uint64_t>> smart_lookup();
 };
 
 

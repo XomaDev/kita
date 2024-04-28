@@ -9,6 +9,7 @@
 #include <stack>
 #include "stack_frame.h"
 #include "address.h"
+#include "structs/binary_value.h"
 
 using namespace std;
 
@@ -35,6 +36,9 @@ public:
     int64_t pop_int();
     pair<stack_type, uint64_t> pop();
 
+    binary_value binary_lookup();
+    void binary_set(uint64_t value);
+
     ulong lookup_func(address address);
 
     void move_address();
@@ -45,6 +49,8 @@ public:
     void relocate_last();
 
     static void free_frame_content(stack_frame *pFrame);
+
+    static bool int_operable(const pair<stack_type, uint64_t> &element) ;
 };
 
 
