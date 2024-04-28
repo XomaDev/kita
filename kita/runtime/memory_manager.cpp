@@ -34,7 +34,7 @@ void memory_manager::move_address() {
 
 void memory_manager::access_address(address addr) {
     auto frame_index = addr.static_definition ? addr.scope : current_depth - addr.scope - 1;
-    auto result = frames[frame_index]->access_address(addr.index);
+    auto result = frames[frame_index]->addresses[addr.index];
     auto dereferenced = frames[frame_index]->stack[result];
     push(dereferenced.first, dereferenced.second);
 }

@@ -18,13 +18,10 @@ public:
     vector<uint64_t> addresses;
     vector<pair<stack_type, uint64_t>> stack;
 
-
     void move_address();
-    uint64_t access_address(ulong index);
 
     void push(stack_type type, uint64_t value);
     pair<stack_type, uint64_t> pop();
-    pair<stack_type, uint64_t> peek_back();
 
     ulong stack_length = 0;
 };
